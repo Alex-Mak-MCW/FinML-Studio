@@ -3246,9 +3246,9 @@ def main():
 
         # --- Help & feedback Expander---
         with st.expander("❓ Help & Docs"):
-            st.write("- [User Guide](https://github.com/Alex-Mak-MCW/Deposit_Subcriptions_Predictions_Project)")
-            st.write("- [Source Code](https://github.com/Alex-Mak-MCW/Deposit_Subcriptions_Predictions_Project/tree/main/Code)")
-            st.write("- [Contact Us](https://www.linkedin.com/in/alex-mak-824187247/)")
+            st.write("- [User Guide](https://github.com/Alex-Mak-MCW/FinML-Studio/blob/main/README.md)")
+            st.write("- [Source Code](https://github.com/Alex-Mak-MCW/FinML-Studio/tree/main)")
+            st.write("- [Contact Me!](https://www.linkedin.com/in/alex-mak-824187247/)")
         
         current_year=datetime.date.today().year
 
