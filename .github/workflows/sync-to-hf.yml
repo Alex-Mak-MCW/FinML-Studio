@@ -9,25 +9,23 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout (with LFS)
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          lfs: true
+          fetch-depth: 1
+          lfs: false   # no need for LFS in the Space anymore
 
-      - name: Materialize LFS files
-        run: |
-          git lfs install --local
-          # make sure we have the real binaries, not 132B pointers
-          git lfs fetch --all
-          git lfs checkout  # or: git lfs pull
-
-      - name: Build deploy snapshot (copy real files, strip LFS rules)
+      - name: Build deploy snapshot (exclude models)
         run: |
           rm -rf hf_deploy && mkdir hf_deploy
-          rsync -a --exclude '.git' --exclude '.github' ./ hf_deploy/
+          rsync -a \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude 'Models/**' \
+            --exclude 'Code/Model_Deployment/**' \
+            ./ hf_deploy/
 
-          # Remove LFS filters so Space stores regular files
+          # Strip LFS rules so Space stores regular files only
           if [ -f hf_deploy/.gitattributes ]; then
             sed -i '/filter=lfs/d' hf_deploy/.gitattributes || true
             [ -s hf_deploy/.gitattributes ] || rm -f hf_deploy/.gitattributes
@@ -38,7 +36,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "HF Space deploy snapshot (real binaries, no LFS)"
+          git commit -m "HF Space deploy snapshot (no models)"
 
       - name: Push snapshot to Space (force overwrite)
         env:
