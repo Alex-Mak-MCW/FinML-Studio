@@ -9,23 +9,27 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout (no LFS needed for snapshot)
+      - name: Checkout (with LFS)
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
-          lfs: false
+          fetch-depth: 0
+          lfs: true
 
-      # Build a CLEAN deploy snapshot with no git history and no LFS filters
-      - name: Build deploy snapshot (strip history & LFS)
+      - name: Materialize LFS files
+        run: |
+          git lfs install --local
+          # make sure we have the real binaries, not 132B pointers
+          git lfs fetch --all
+          git lfs checkout  # or: git lfs pull
+
+      - name: Build deploy snapshot (copy real files, strip LFS rules)
         run: |
           rm -rf hf_deploy && mkdir hf_deploy
           rsync -a --exclude '.git' --exclude '.github' ./ hf_deploy/
 
-          # Strip LFS rules so nothing is treated as LFS in the Space
+          # Remove LFS filters so Space stores regular files
           if [ -f hf_deploy/.gitattributes ]; then
-            # remove any lines that enable LFS
             sed -i '/filter=lfs/d' hf_deploy/.gitattributes || true
-            # if .gitattributes becomes empty, remove it
             [ -s hf_deploy/.gitattributes ] || rm -f hf_deploy/.gitattributes
           fi
 
@@ -34,17 +38,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "HF Space deploy snapshot (no history, no LFS)"
+          git commit -m "HF Space deploy snapshot (real binaries, no LFS)"
 
-      - name: Push snapshot to Space (force overwrite Space history)
+      - name: Push snapshot to Space (force overwrite)
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           cd hf_deploy
           git push https://Alex-Mak-MCW:${HF_TOKEN}@huggingface.co/spaces/Alex-Mak-MCW/FinML-Studio.git HEAD:main --force
-
-      # Optional: print what we shipped
-      - name: List files shipped
-        run: |
-          cd hf_deploy
-          git ls-tree --name-only -r HEAD
