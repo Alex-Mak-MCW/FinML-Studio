@@ -3174,6 +3174,10 @@ def main():
                 margin-top: -100px;   /* adjust negative value as needed */
                 margin-bottom:-75px;
             }
+            [data-testid="stSidebar"] .stCaption {
+                text-align: center;
+                display: block;
+            }
             </style>
             """,
             unsafe_allow_html=True
