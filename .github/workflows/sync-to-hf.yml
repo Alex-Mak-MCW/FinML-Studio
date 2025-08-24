@@ -24,7 +24,6 @@ jobs:
       - name: Create orphan deploy snapshot
         run: |
           git checkout --orphan space-deploy
-          git reset --hard
           git add -A
           git commit -m "HF Space deploy snapshot (no history, no old LFS)"
 
