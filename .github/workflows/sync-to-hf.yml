@@ -8,27 +8,33 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout (no need to pull old LFS)
+      - name: Checkout (with LFS files)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          lfs: false
+          lfs: true
 
-      - name: Configure bot identity
+      - name: Setup git + LFS
         run: |
+          git lfs install --local
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      # Create a brand-new history (orphan) that only contains the CURRENT tree
-      - name: Create orphan deploy snapshot
-        run: |
-          git checkout --orphan space-deploy
-          git add -A
-          git commit -m "HF Space deploy snapshot (no history, no old LFS)"
+      # Optional: sanity output (helps confirm nothing under Code/Model_Deployment is tracked anymore)
+      - name: Show LFS tracking
+        run: git lfs track
 
-      - name: Push snapshot to Space (force overwrite Space history)
+      # <<< The setting you asked for >>>
+      - name: Allow incomplete LFS push (safe if latest commit needs none)
+        run: git config lfs.allowincompletepush true
+
+      # Push HEAD of your GitHub repo to the Space's main branch
+      - name: Push to Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git push https://Alex-Mak-MCW:${HF_TOKEN}@huggingface.co/spaces/Alex-Mak-MCW/FinML-Studio.git HEAD:main --force
+          git push https://Alex-Mak-MCW:${HF_TOKEN}@huggingface.co/spaces/Alex-Mak-MCW/FinML-Studio.git HEAD:main
+          # If histories are unrelated the first time, uncomment the line below instead:
+          # git push https://Alex-Mak-MCW:${HF_TOKEN}@huggingface.co/spaces/Alex-Mak-MCW/FinML-Studio.git HEAD:main --force
