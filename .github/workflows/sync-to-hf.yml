@@ -1,43 +1,37 @@
-name: Sync to Hugging Face hub
+name: Deploy to Hugging Face Space
 
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
-  sync-to-hub:
+  deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout (with LFS files)
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          lfs: false     # we don't want LFS at all for the Space
-      
-      - name: Build filtered deploy bundle (exclude Model_Deployment)
-        env:
-          EXCLUDES: |
-            --exclude '.git'
-            --exclude '.github'
-            --exclude 'Code/Model_Deployment/**'
+          lfs: true     # fetch real LFS files (images, notebooks, etc.)
+
+      - name: Setup git + LFS (local)
         run: |
-          rm -rf hf_deploy && mkdir hf_deploy
-          rsync -av $EXCLUDES ./ hf_deploy/
-      
-          # Optional: strip LFS rules so nothing is treated as LFS in the Space
-          if [ -f hf_deploy/.gitattributes ]; then
-            sed -i '/filter=lfs/d' hf_deploy/.gitattributes || true
-          fi
-      
-      - name: Commit and push snapshot to Space
+          git lfs install --local
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # (optional) sanity check: show current LFS patterns after your 'untrack'
+      - name: Show LFS tracking
+        run: git lfs track
+
+      # Push your current branch HEAD to the Space's main branch
+      # Use --force the FIRST time if the Space history is unrelated
+      - name: Push to Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          cd hf_deploy
-          git init
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "HF Space deploy (filtered snapshot: exclude Code/Model_Deployment)"
-          git push https://Alex-Mak-MCW:${HF_TOKEN}@huggingface.co/spaces/Alex-Mak-MCW/FinML-Studio.git HEAD:main --force
-
-
+          git push https://Alex-Mak-MCW:${HF_TOKEN}@huggingface.co/spaces/Alex-Mak-MCW/FinML-Studio.git HEAD:main
+          # If histories are unrelated on first run, use:
+          # git push https://Alex-Mak-MCW:${HF_TOKEN}@huggingface.co/spaces/Alex-Mak-MCW/FinML-Studio.git HEAD:main --force
