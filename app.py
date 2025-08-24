@@ -1934,8 +1934,7 @@ def display_prediction(prediction):
     # Predict success case:
     if prediction[0] == 1:
         with col1:
-            st.image("Visualizations/Result_Icons/success_icon.png", width=50)  # Use an icon for success
-            # st.image("Code/Model_Deployment/Visualizations/Result_Icons/success_icon.png", width=50)  # Use an icon for success
+            st.image("App_Visualizations/Result_Icons/success_icon.png", width=50)  # Use an icon for success
         with col2:
             # st.write("### The Marketing Campaign will Succeed!")
             st.markdown(
@@ -1946,8 +1945,7 @@ def display_prediction(prediction):
     # Predict failure case:
     elif prediction[0] == 0:
         with col1:
-            st.image("Visualizations/Result_Icons/failure_icon.png", width=50)  # Use an icon for failure
-            # st.image("Code/Model_Deployment/Visualizations/Result_Icons/success_icon.png", width=50)  # Use an icon for success
+            st.image("App_Visualizations/Result_Icons/failure_icon.png", width=50)  # Use an icon for failure
         with col2:
             # st.write("### The Marketing Campaign will Fail.")
             st.markdown(
@@ -2077,25 +2075,25 @@ def home_page(models, data, raw_data):
             "Subscription Prediction",
             "Use fine-tuned AI/ML models to predict will a client subscribe the product!",
             "Deposit Subscription Prediction",
-            f"{cloud_deployment}Visualizations/Homepage_Icons/predictive-icon.jpg"
+            f"{cloud_deployment}App_Visualizations/Homepage_Icons/predictive-icon.jpg"
         ),
         (
             "Interactive Dashboard",
             "Find out underlying trends & insights via exploratory data analysis (EDA)!",
             "Interactive Dashboard",
-            f"{cloud_deployment}Visualizations/Homepage_Icons/dashboard-icon.jpg"
+            f"{cloud_deployment}App_Visualizations/Homepage_Icons/dashboard-icon.jpg"
         ),
         (
             "Customer Segmentation",
             "Intelligently assign customers into groups with our clustering algorithm!",
             "Customer Segmentation",
-            f"{cloud_deployment}Visualizations/Homepage_Icons/cluster-analysis-icon.jpg"
+            f"{cloud_deployment}App_Visualizations/Homepage_Icons/cluster-analysis-icon.jpg"
         ),
         (
             "Data Overview & Export",
             "Download & use our original / cleaned data prepared for you!",
             "Data Overview & Export",
-            f"{cloud_deployment}Visualizations/Homepage_Icons/export-data-icon.jpg"
+            f"{cloud_deployment}App_Visualizations/Homepage_Icons/export-data-icon.jpg"
         ),
     ]
 
@@ -3099,8 +3097,7 @@ def acknowledgement_page(data):
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    st.image("Visualizations/title_icon_temp.gif", width=300, caption="Me vibin' when I am creating this project :)")
-    # st.image("Code/Model_Deployment/Visualizations/title_icon_temp.gif", width=300, caption="Me vibin' when I am creating this project :)")
+    st.image("App_Visualizations/title_icon_temp.gif", width=300, caption="Me vibin' when I am creating this project :)")
 
 # --- MAIN APP ---
 #-----------------------------------------------
@@ -3182,8 +3179,7 @@ def main():
             unsafe_allow_html=True
         )
 
-        st.image("Visualizations/Homepage_Icons/sidebar-icon.png", width=290)  # Use an icon for success
-        # st.image("Code/Model_Deployment/Visualizations/Homepage_Icons/sidebar-icon.png", width=290)  # Use an icon for success
+        st.image("App_Visualizations/Homepage_Icons/sidebar-icon.png", width=290)  # Use an icon for success
         
         
         # If decided to show app title in text (just uncomment)
