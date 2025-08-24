@@ -8,33 +8,43 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout (with LFS files)
+      - name: Checkout (no LFS needed for snapshot)
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          lfs: true
+          fetch-depth: 1
+          lfs: false
 
-      - name: Setup git + LFS
+      # Build a CLEAN deploy snapshot with no git history and no LFS filters
+      - name: Build deploy snapshot (strip history & LFS)
         run: |
-          git lfs install --local
+          rm -rf hf_deploy && mkdir hf_deploy
+          rsync -a --exclude '.git' --exclude '.github' ./ hf_deploy/
+
+          # Strip LFS rules so nothing is treated as LFS in the Space
+          if [ -f hf_deploy/.gitattributes ]; then
+            # remove any lines that enable LFS
+            sed -i '/filter=lfs/d' hf_deploy/.gitattributes || true
+            # if .gitattributes becomes empty, remove it
+            [ -s hf_deploy/.gitattributes ] || rm -f hf_deploy/.gitattributes
+          fi
+
+          cd hf_deploy
+          git init
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "HF Space deploy snapshot (no history, no LFS)"
 
-      # Optional: sanity output (helps confirm nothing under Code/Model_Deployment is tracked anymore)
-      - name: Show LFS tracking
-        run: git lfs track
-
-      # <<< The setting you asked for >>>
-      - name: Allow incomplete LFS push (safe if latest commit needs none)
-        run: git config lfs.allowincompletepush true
-
-      # Push HEAD of your GitHub repo to the Space's main branch
-      - name: Push to Space
+      - name: Push snapshot to Space (force overwrite Space history)
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git push https://Alex-Mak-MCW:${HF_TOKEN}@huggingface.co/spaces/Alex-Mak-MCW/FinML-Studio.git HEAD:main
-          # If histories are unrelated the first time, uncomment the line below instead:
-          # git push https://Alex-Mak-MCW:${HF_TOKEN}@huggingface.co/spaces/Alex-Mak-MCW/FinML-Studio.git HEAD:main --force
+          cd hf_deploy
+          git push https://Alex-Mak-MCW:${HF_TOKEN}@huggingface.co/spaces/Alex-Mak-MCW/FinML-Studio.git HEAD:main --force
+
+      # Optional: print what we shipped
+      - name: List files shipped
+        run: |
+          cd hf_deploy
+          git ls-tree --name-only -r HEAD
