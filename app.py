@@ -3174,10 +3174,6 @@ def main():
                 margin-top: -100px;   /* adjust negative value as needed */
                 margin-bottom:-75px;
             }
-            [data-testid="stSidebar"] .stCaption {
-                text-align: center;
-                display: block;
-            }
             </style>
             """,
             unsafe_allow_html=True
@@ -3199,7 +3195,13 @@ def main():
 
 
         today = datetime.date.today().strftime("%Y-%m-%d")
-        st.caption(f"v1.1.0 • Last Updated On: {today}")
+        # st.caption(f"v1.1.0 • Last Updated On: {today}")
+        st.markdown(
+            f"<h5 style='text-align:center;margin:0.25rem 0;'>"
+            f"v1.1.0 • Last Updated On: {today}"
+            f"</h5>",
+            unsafe_allow_html=True,
+        )
 
         st.markdown("---")
 
