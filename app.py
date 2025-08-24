@@ -1934,8 +1934,8 @@ def display_prediction(prediction):
     # Predict success case:
     if prediction[0] == 1:
         with col1:
-            # st.image("Visualizations/Result_Icons/success_icon.png", width=50)  # Use an icon for success
-            st.image("Code/Model_Deployment/Visualizations/Result_Icons/success_icon.png", width=50)  # Use an icon for success
+            st.image("Visualizations/Result_Icons/success_icon.png", width=50)  # Use an icon for success
+            # st.image("Code/Model_Deployment/Visualizations/Result_Icons/success_icon.png", width=50)  # Use an icon for success
         with col2:
             # st.write("### The Marketing Campaign will Succeed!")
             st.markdown(
@@ -1946,8 +1946,8 @@ def display_prediction(prediction):
     # Predict failure case:
     elif prediction[0] == 0:
         with col1:
-            # st.image("Visualizations/Result_Icons/failure_icon.png", width=50)  # Use an icon for failure
-            st.image("Code/Model_Deployment/Visualizations/Result_Icons/success_icon.png", width=50)  # Use an icon for success
+            st.image("Visualizations/Result_Icons/failure_icon.png", width=50)  # Use an icon for failure
+            # st.image("Code/Model_Deployment/Visualizations/Result_Icons/success_icon.png", width=50)  # Use an icon for success
         with col2:
             # st.write("### The Marketing Campaign will Fail.")
             st.markdown(
@@ -2069,13 +2069,13 @@ def home_page(models, data, raw_data):
     st.markdown("<br>", unsafe_allow_html=True)
     # for local deployment
 
-    # cloud_deployment=""
-    cloud_deployment="Code/Model_Deployment/"
+    cloud_deployment=""
+    # cloud_deployment="Code/Model_Deployment/"
 
     cards = [
         (
             "Subscription Prediction",
-            "Use our AI/ML model to predict will a client subscribe the product!",
+            "Use fine-tuned AI/ML models to predict will a client subscribe the product!",
             "Deposit Subscription Prediction",
             f"{cloud_deployment}Visualizations/Homepage_Icons/predictive-icon.jpg"
         ),
@@ -2157,7 +2157,7 @@ def prediction_page(models, data):
 
     st.markdown(
         "<h1 class='page-title' style='color:#FFC107;'>Predicting Term Deposit Subscription"
-        "<span style='color:white;'> - Choose an AI/ML Model Below</span></h1>",
+        "<span style='color:white;'> - With our Tuned AI/ML Model</span></h1>",
         unsafe_allow_html=True
     )
     st.markdown("<hr>",unsafe_allow_html=True) 
@@ -3092,15 +3092,15 @@ def acknowledgement_page(data):
     <br><br>
     Additionally, I want to acknowledge <span style='color: #FFC107;'>**Sérgio Moro**</span>, <span style='color: #FFC107;'>**P. Cortez**</span>, and <span style='color: #FFC107;'>**P. Rita**</span> for sharing the UCI ML Bank Telemarketing Dataset, which is the fundamental backbone of this project.
     <br><br>
-    Last but not least, shout out to the user test group (<span style='color: #FFC107;'>Steven Ge, Ruike Xu, Tek Chan, Jerry Chan, David Lee</span>). Their opinions and feedback on this project should be recognized.
+    Last but not least, shout out to the user test group (<span style='color: #FFC107;'> **Steven Ge**, **Ruike Xu**, **Tek Chan**, **Jerry Chan**, **David Lee**</span>). Their opinions and feedback on this project should be recognized.
 
     """
     st.markdown(ack_html, unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # st.image("Visualizations/title_icon_temp.gif", width=300, caption="Me vibin' when I am creating this project :)")
-    st.image("Code/Model_Deployment/Visualizations/title_icon_temp.gif", width=300, caption="Me vibin' when I am creating this project :)")
+    st.image("Visualizations/title_icon_temp.gif", width=300, caption="Me vibin' when I am creating this project :)")
+    # st.image("Code/Model_Deployment/Visualizations/title_icon_temp.gif", width=300, caption="Me vibin' when I am creating this project :)")
 
 # --- MAIN APP ---
 #-----------------------------------------------
@@ -3182,8 +3182,8 @@ def main():
             unsafe_allow_html=True
         )
 
-        # st.image("Visualizations/Homepage_Icons/sidebar-icon.png", width=290)  # Use an icon for success
-        st.image("Code/Model_Deployment/Visualizations/Homepage_Icons/sidebar-icon.png", width=290)  # Use an icon for success
+        st.image("Visualizations/Homepage_Icons/sidebar-icon.png", width=290)  # Use an icon for success
+        # st.image("Code/Model_Deployment/Visualizations/Homepage_Icons/sidebar-icon.png", width=290)  # Use an icon for success
         
         
         # If decided to show app title in text (just uncomment)
