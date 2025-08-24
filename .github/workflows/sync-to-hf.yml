@@ -14,15 +14,11 @@ jobs:
           fetch-depth: 0
 
       - name: Install Git LFS
-        run: git lfs install
+        run: git lfs install --local
 
       - name: Push to Hugging Face Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          HF_USER: Alex-Mak-MCW
-          HF_SPACE: FinML-Studio
         run: |
-          set -euo pipefail
-          git remote remove space 2>/dev/null || true
-          git remote add space https://$HF_USER:$HF_TOKEN@huggingface.co/spaces/$HF_USER/$HF_SPACE
-          git push --force space HEAD:main
+          git push "https://HF_USERNAME:${HF_TOKEN}@huggingface.co/spaces/HF_USERNAME/SPACE_NAME" main
+
