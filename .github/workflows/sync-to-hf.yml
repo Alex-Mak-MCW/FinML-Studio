@@ -8,30 +8,28 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout (with LFS files)
+      - name: Checkout (no need to pull old LFS)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          lfs: true     # fetch real LFS files (images, notebooks, etc.)
+          lfs: false
 
-      - name: Setup git + LFS (local)
+      - name: Configure bot identity
         run: |
-          git lfs install --local
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      # (optional) sanity check: show current LFS patterns after your 'untrack'
-      - name: Show LFS tracking
-        run: git lfs track
+      # Create a brand-new history (orphan) that only contains the CURRENT tree
+      - name: Create orphan deploy snapshot
+        run: |
+          git checkout --orphan space-deploy
+          git reset --hard
+          git add -A
+          git commit -m "HF Space deploy snapshot (no history, no old LFS)"
 
-      # Push your current branch HEAD to the Space's main branch
-      # Use --force the FIRST time if the Space history is unrelated
-      - name: Push to Space
+      - name: Push snapshot to Space (force overwrite Space history)
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git push https://Alex-Mak-MCW:${HF_TOKEN}@huggingface.co/spaces/Alex-Mak-MCW/FinML-Studio.git HEAD:main
-          # If histories are unrelated on first run, use:
-          # git push https://Alex-Mak-MCW:${HF_TOKEN}@huggingface.co/spaces/Alex-Mak-MCW/FinML-Studio.git HEAD:main --force
+          git push https://Alex-Mak-MCW:${HF_TOKEN}@huggingface.co/spaces/Alex-Mak-MCW/FinML-Studio.git HEAD:main --force
