@@ -6,6 +6,6 @@ app_file: app.py
 pinned: false
 tags:
   - streamlit
-  - banking
+  - banking/ finance
   - ml
 ---
