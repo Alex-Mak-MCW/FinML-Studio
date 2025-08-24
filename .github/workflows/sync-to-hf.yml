@@ -10,15 +10,34 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          lfs: true # pulls LFS pointers + files
           fetch-depth: 0
-
-      - name: Install Git LFS
-        run: git lfs install --local
-
-      - name: Push to Hugging Face Space
+          lfs: false     # we don't want LFS at all for the Space
+      
+      - name: Build filtered deploy bundle (exclude Model_Deployment)
+        env:
+          EXCLUDES: |
+            --exclude '.git'
+            --exclude '.github'
+            --exclude 'Code/Model_Deployment/**'
+        run: |
+          rm -rf hf_deploy && mkdir hf_deploy
+          rsync -av $EXCLUDES ./ hf_deploy/
+      
+          # Optional: strip LFS rules so nothing is treated as LFS in the Space
+          if [ -f hf_deploy/.gitattributes ]; then
+            sed -i '/filter=lfs/d' hf_deploy/.gitattributes || true
+          fi
+      
+      - name: Commit and push snapshot to Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git push "https://HF_USERNAME:${HF_TOKEN}@huggingface.co/spaces/Alex-Mak-MCW/FinML-Studio" main
+          cd hf_deploy
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "HF Space deploy (filtered snapshot: exclude Code/Model_Deployment)"
+          git push https://Alex-Mak-MCW:${HF_TOKEN}@huggingface.co/spaces/Alex-Mak-MCW/FinML-Studio.git HEAD:main --force
+
 
