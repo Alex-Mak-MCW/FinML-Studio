@@ -1,51 +1,41 @@
-name: Sync to Hugging Face branch
+name: Deploy to Hugging Face Space
 
 on:
   push:
-    branches: [ main ]   # whenever you push to main
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
-  make-hf-branch:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout with LFS
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          lfs: true
 
-      - name: Prepend HF YAML to README
+      - name: Materialize LFS blobs (ensure real files, not pointers)
         run: |
-          cat > .hf_header.yml <<'EOF'
-          ---
-          title: Fin-ML-Studio
-          emoji: 📈
-          sdk: streamlit
-          app_file: app.py
-          pinned: false
-          tags:
-            - streamlit
-            - banking/ finance
-            - ml
-          ---
-          EOF
-          # Build HF README (YAML + your clean README)
-          cat .hf_header.yml README.md > README.hf.md
+          git lfs install --local
+          git lfs pull
+          # sanity print (optional)
+          git lfs ls-files --size
 
-      - name: Create workspace for hf branch
+      - name: Configure bot identity
         run: |
-          rm -rf .hf-tmp
-          mkdir -p .hf-tmp
-          rsync -a --exclude '.git' ./ .hf-tmp/
-          mv README.hf.md .hf-tmp/README.md
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Commit & push to hf branch
+      # Orphan snapshot so the Space has ONLY the current tree (no old history)
+      - name: Create orphan deploy snapshot (keep LFS filters)
         run: |
-          cd .hf-tmp
-          git init
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git checkout -b hf
+          git checkout --orphan space-deploy
           git add -A
-          git commit -m "Sync from main with HF YAML header"
-          git remote add origin "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git"
-          git push -f origin hf   # overwrite hf branch with new state
+          git commit -m "Space deploy snapshot (with LFS)"
+
+      - name: Push snapshot to Space (force overwrite)
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git push https://Alex-Mak-MCW:${HF_TOKEN}@huggingface.co/spaces/Alex-Mak-MCW/FinML-Studio.git HEAD:main --force
