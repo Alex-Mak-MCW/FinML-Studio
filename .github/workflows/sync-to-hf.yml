@@ -9,38 +9,33 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout with LFS
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
-          lfs: false   # no need for LFS in the Space anymore
+          lfs: true
 
-      - name: Build deploy snapshot (exclude models)
+      - name: Materialize LFS blobs (ensure real files, not pointers)
         run: |
-          rm -rf hf_deploy && mkdir hf_deploy
-          rsync -a \
-            --exclude '.git' \
-            --exclude '.github' \
-            --exclude 'Models/**' \
-            --exclude 'Code/Model_Deployment/**' \
-            ./ hf_deploy/
+          git lfs install --local
+          git lfs pull
+          # sanity print (optional)
+          git lfs ls-files --size
 
-          # Strip LFS rules so Space stores regular files only
-          if [ -f hf_deploy/.gitattributes ]; then
-            sed -i '/filter=lfs/d' hf_deploy/.gitattributes || true
-            [ -s hf_deploy/.gitattributes ] || rm -f hf_deploy/.gitattributes
-          fi
-
-          cd hf_deploy
-          git init
+      - name: Configure bot identity
+        run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # Orphan snapshot so the Space has ONLY the current tree (no old history)
+      - name: Create orphan deploy snapshot (keep LFS filters)
+        run: |
+          git checkout --orphan space-deploy
           git add -A
-          git commit -m "HF Space deploy snapshot (no models)"
+          git commit -m "Space deploy snapshot (with LFS)"
 
       - name: Push snapshot to Space (force overwrite)
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          cd hf_deploy
           git push https://Alex-Mak-MCW:${HF_TOKEN}@huggingface.co/spaces/Alex-Mak-MCW/FinML-Studio.git HEAD:main --force
