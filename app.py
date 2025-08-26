@@ -1443,7 +1443,7 @@ def get_excel_buffer(df: pd.DataFrame) -> io.BytesIO:
 #-----------------------------------------------
 #-----------------------------------------------
 st.set_page_config(
-    page_title="Bank Term Deposit App", 
+    page_title="FinML-Studio", 
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -3082,15 +3082,14 @@ def acknowledgement_page(data):
 
 
     ack_html = """
-    First of all, this entire application comes from a graduate data science course project where my teammates <span style='color: #FFC107;'>**Zheng En Than**</span> and <span style='color: #FFC107;'>**Emily Au**</span>. We cleaned the collected data, 
-    performed exploratory data analysis, developed the machine learning models, and wrote a scientific report together. I sincerely thank them for their effort and hard work. 
-    I would also like to thank my course instructor <span style='color: #FFC107;'>**Dr. Jay Newby**</span> for his guidance and mentorship.
-    <br><br>
-    This app is made with the purpose of applying our research on a high level. If you are interested to learn more about the scientific details of our work, please visit the <a href="https://github.com/Alex-Mak-MCW/Deposit_Subcriptions_Predictions_Project" target="_blank"><strong>User Guide</strong></a>!
+    First of all, this entire application was developed starts from a graduate data science course project. I further tuned the built models, operationalized them under a streamlit application and added more features. 
+    
+    I want to sincerely thank my project teammates: <span style='color: #FFC107;'>**Zheng En Than**</span> and <span style='color: #FFC107;'>**Emily Au**</span>. We cleaned the collected data, 
+    performed exploratory data analysis, developed the machine learning models, and wrote a scientific report together. I would also like to thank my course instructor <span style='color: #FFC107;'>**Dr. Jay Newby**</span> for his guidance and mentorship. If you are interested to learn more about the scientific details of our work, please visit the <a href="https://github.com/Alex-Mak-MCW/Deposit_Subcriptions_Predictions_Project" target="_blank"><strong>User Guide</strong></a>!
     <br><br>
     Additionally, I want to acknowledge <span style='color: #FFC107;'>**Sérgio Moro**</span>, <span style='color: #FFC107;'>**P. Cortez**</span>, and <span style='color: #FFC107;'>**P. Rita**</span> for sharing the UCI ML Bank Telemarketing Dataset, which is the fundamental backbone of this project.
     <br><br>
-    Last but not least, shout out to the user test group (<span style='color: #FFC107;'> **Steven Ge**, **Ruike Xu**, **Tek Chan**, **Jerry Chan**, **David Lee**</span>). Their opinions and feedback on this project should be recognized.
+    Last but not least, shout out to the user test group (<span style='color: #FFC107;'>**Steven Ge**, **Ruike Xu**, **Tek Chan**, **Jerry Chan**, **David Lee**</span>). Their opinions and feedback further elevate this project to a whole new level.
 
     """
     st.markdown(ack_html, unsafe_allow_html=True)
