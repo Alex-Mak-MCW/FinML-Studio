@@ -58,3 +58,7 @@ streamlit run app.py
 - repo
 - old repo
 
+Todo:
+Table of contents?
+review
+push
