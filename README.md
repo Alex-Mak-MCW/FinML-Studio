@@ -13,7 +13,7 @@ tags:
 <hr>
 
 <p align="center">
-  <img src="App_Visualizations/Homepage_Icons/sidebar-icon.png" alt="App Icon" width="200">
+  <img src="App_Visualizations/Homepage_Icons/sidebar-icon.png" alt="App Icon" width="500">
 </p>
 
 End-to-end fintech app leveraging data science & AI/ML for **product analytics** and **business intelligence**.
@@ -48,7 +48,9 @@ End-to-end fintech app leveraging data science & AI/ML for **product analytics**
 
 # Screenshots
 
-![Homepage Screenshot](App_Visualizations/Screenshots/homepage.png)
+<p align="center">
+  <img src="App_Visualizations/Homepage.png" alt="App Homepage" width="800">
+</p>
 
 ---
 
