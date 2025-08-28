@@ -40,11 +40,11 @@ End-to-end fintech app leveraging data science & AI/ML for **product analytics**
 
 | | |
 |---|---|
-| **1. Product Analytics**                                  | Employed ML models to **find key profit-generating features**. |
-| **2. Profit Forecasting**                                 | Developed & fine-tuned ML models to **predict product growth**. |
-| **3. Interactive Dashboards**                             | Highlight **actionable recommendations** & **underlying insights**.  |
-| **4. Customer Segmentation / Profiling / Churning**       | **Group customers** with clusters and analyze their characteristics. |
-| **5. Accessible Solutions**                                | All features are in a **scalable app** so they can be used anytime! |
+| **1. Product Analytics**                                  | Used ML models to **find key profit-generating features**. |
+| **2. Profit Forecasting**                                 | Fine-tuned ML models to **predict product growth**. |
+| **3. Interactive Dashboards**                             | Highlight **actionable recommendations** & **hidden insights**.  |
+| **4. Customer Segmentation / Profiling / Churning**       | **Group customers** with clusters & analyze their characteristics. |
+| **5. Accessible Solutions**                               | All features are ready to be used in a **scalable app**! |
 
 # Screenshots
 
