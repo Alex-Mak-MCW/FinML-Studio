@@ -34,7 +34,7 @@ End-to-end fintech app leveraging data science & ML for product analytics, deman
 | **1. Product Analytics**                              | Employed ML models to **find key profit-generating features**. |
 | **2. Profit Forecasting**                             | Developed & fine-tuned ML models to **predict product growth**. |
 | **3. Customer Segmentation/ Profiling/ Churning**     | Build clusters to automatically **group customers** and analyze their characteristics. |
-| **4. Acessible Solutions**                            | Wrapping all features in a **scalable app** so they can be used anytime! |
+| **4. Acessible Solutions**                            | All features are in a **scalable app** so they can be used anytime! |
 
 
 ---
