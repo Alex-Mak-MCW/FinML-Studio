@@ -16,12 +16,12 @@ tags:
   <img src="App_Visualizations/Homepage_Icons/sidebar-icon.png" alt="App Icon" width="200">
 </p>
 
-End-to-end fintech app leveraging data science & ML for **product analytics**, **demand forecasting**, and **business intelligence**.
+End-to-end fintech app leveraging data science & AI/ML for **product analytics** and **business intelligence**.
 
 # 📑 Table of Contents
 - [Features](#features)
-- [Quickstart](#quickstart)
-- [Stack (Python)](#technical-stack)
+- [Using the App](#using-the-app)
+- [Technial Stack](#technical-stack)
 - [Contact](#contact)
 
 👉 [Live Demo - TBA](#)  
@@ -52,7 +52,7 @@ End-to-end fintech app leveraging data science & ML for **product analytics**, *
 
 ---
 
-# Quickstart
+# Using the App
 
 ### Method 1: Directly Access the App
 Visit my app on [Streamlit Community Cloud](#) or [Hugging Face Space](#)
@@ -73,7 +73,6 @@ streamlit run app.py
 | **Machine Learning**  | - **scikit-learn** for ML model development <br> - **hdbscan** for clustering algorithms <br> - **SHAP, LIME** for explainable AI (XAI) |
 | **MLOps & Deployment**| - **Streamlit** for interactive app development <br> - **Docker** for containerization |
 | **Project Management**| - **GitHub Projects** for agile development & software development life cycle |
-
 
 
 # Contact
