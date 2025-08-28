@@ -12,14 +12,16 @@ tags:
 
 <hr>
 
-![Alt text](App_Visualizations/Homepage_Icons/sidebar-icon.png)
+<p align="center">
+  <img src="App_Visualizations/Homepage_Icons/sidebar-icon.png" alt="App Icon" width="200">
+</p>
 
 End-to-end fintech app leveraging data science & ML for **product analytics**, **demand forecasting**, and **business intelligence**.
 
 # 📑 Table of Contents
 - [Features](#features)
 - [Quickstart](#quickstart)
-- [Stack (Python)](#stack-python)
+- [Stack (Python)](#technical-stack)
 - [Contact](#contact)
 
 👉 [Live Demo - TBA](#)  
@@ -34,7 +36,7 @@ End-to-end fintech app leveraging data science & ML for **product analytics**, *
 - **Acessible Solutions** Users can use all of the AI-empowered features above anytime they want!
 -->
 
-# ✨ Features 
+# Features 
 
 | | |
 |---|---|
@@ -44,13 +46,13 @@ End-to-end fintech app leveraging data science & ML for **product analytics**, *
 | **4. Customer Segmentation / Profiling / Churning**       | **Group customers** with clusters and analyze their characteristics. |
 | **5. Accessible Solutions**                                | All features are in a **scalable app** so they can be used anytime! |
 
-# 📸 Screenshots
+# Screenshots
 
 ![Homepage Screenshot](App_Visualizations/Screenshots/homepage.png)
 
 ---
 
-# 🚀 Quickstart
+# Quickstart
 
 ### Method 1: Directly Access the App
 Visit my app on [Streamlit Community Cloud](#) or [Hugging Face Space](#)
@@ -62,7 +64,7 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-# 🛠️ Stack (Python)
+# Technical Stack
 
 | | |
 |---|---|
