@@ -13,16 +13,20 @@ tags:
 <hr>
 
 <p align="center">
-  <img src="App_Visualizations/Homepage_Icons/sidebar-icon.png" alt="App Icon" width="200">
+  <img src="App_Visualizations/Homepage_Icons/sidebar-icon.png" alt="App Icon" width="500">
 </p>
 
 End-to-end fintech app leveraging data science & AI/ML for **product analytics** and **business intelligence**.
+
+<br>
 
 # 📑 Table of Contents
 - [Features](#features)
 - [Using the App](#using-the-app)
 - [Technial Stack](#technical-stack)
 - [Contact](#contact)
+
+<br>
 
 👉 [Live Demo - TBA](#)  
 ---
@@ -35,27 +39,34 @@ End-to-end fintech app leveraging data science & AI/ML for **product analytics**
 - **Customer Segmentation, Profiling, and Churning** Build clusters to automatically group customers into groups and analyze their characteristics.
 - **Acessible Solutions** Users can use all of the AI-empowered features above anytime they want!
 -->
+<br>
 
 # Features 
 
 | | |
 |---|---|
-| **1. Product Analytics**                                  | Employed ML models to **find key profit-generating features**. |
-| **2. Profit Forecasting**                                 | Developed & fine-tuned ML models to **predict product growth**. |
-| **3. Interactive Dashboards**                             | Highlight **actionable recommendations** & **underlying insights**.  |
-| **4. Customer Segmentation / Profiling / Churning**       | **Group customers** with clusters and analyze their characteristics. |
-| **5. Accessible Solutions**                                | All features are in a **scalable app** so they can be used anytime! |
+| **1. Product Analytics**                                  | Used ML models to **find key profit-generating features**. |
+| **2. Profit Forecasting**                                 | Fine-tuned ML models to **predict product growth**. |
+| **3. Interactive Dashboards**                             | Highlight **actionable recommendations** & **hidden insights**.  |
+| **4. Customer Segmentation / Profiling / Churning**       | **Group customers** with clusters & analyze their characteristics. |
+| **5. Accessible Solutions**                               | All features are ready to be used in a **scalable app**! |
+
+<br>
 
 # Screenshots
 
-![Homepage Screenshot](App_Visualizations/Screenshots/homepage.png)
+<p align="center">
+  <img src="App_Visualizations/Homepage.png" alt="App Homepage" width="800">
+</p>
 
 ---
+<br>
 
 # Using the App
 
 ### Method 1: Directly Access the App
 Visit my app on [Streamlit Community Cloud](#) or [Hugging Face Space](#)
+<br><br>
 ### Method 2: Deploy it locally on your computer --> copy & paste the following command
 ```bash
 git clone https://github.com/Alex-Mak-MCW/FinML-Studio
@@ -63,6 +74,7 @@ cd Fin-ML-Studio
 pip install -r requirements.txt
 streamlit run app.py
 ```
+<br>
 
 # Technical Stack
 
@@ -74,6 +86,7 @@ streamlit run app.py
 | **MLOps & Deployment**| - **Streamlit** for interactive app development <br> - **Docker** for containerization |
 | **Project Management**| - **GitHub Projects** for agile development & software development life cycle |
 
+<br>
 
 # Contact
 Any questions/comments/feedback/opinion about my work? Feel free to contact me!
