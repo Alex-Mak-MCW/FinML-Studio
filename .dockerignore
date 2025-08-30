@@ -1,0 +1,12 @@
+.git
+.gitignore
+.gitlfs
+.venv
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.ipynb_checkpoints
+Data/
+Modelling_Visualizations_Output/
+*.log
