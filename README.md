@@ -53,8 +53,6 @@ An end-to-end ML app leveraging data science & AI/ML for **product analytics** a
 
 <br>
 
-# Screenshots
-
 <p align="center">
   <img src="App_Visualizations/Homepage.png" alt="App Homepage" width="800">
 </p>
@@ -63,12 +61,13 @@ An end-to-end ML app leveraging data science & AI/ML for **product analytics** a
 
 # Using the App
 
-### Method 1: Directly Access the App
-Visit my app on [Streamlit Community Cloud](https://alex-mak-mcw-finml-studio-app-tzhae8.streamlit.app/) or [Hugging Face Space](https://huggingface.co/spaces/Alex-Mak-MCW/FinML-Studio)!
+## Method 1: Directly Access the App
+### Visit my app on [Streamlit Community Cloud](https://alex-mak-mcw-finml-studio-app-tzhae8.streamlit.app/) or [Hugging Face Space](https://huggingface.co/spaces/Alex-Mak-MCW/FinML-Studio)!
 
 <br> 
 
-### Method 2: Deploy it locally on your computer --> copy & paste the following command
+## Method 2: Deploy it locally on your computer 
+### Copy & paste the following command:
 ```bash
 git clone https://github.com/Alex-Mak-MCW/FinML-Studio
 cd Fin-ML-Studio
@@ -91,8 +90,6 @@ streamlit run app.py
 <br>
 
 # Contact
-Any questions/comments/feedback/opinion about my work? Feel free to contact me!
-
-👉 [My Linkedin!](https://www.linkedin.com/in/alex-mak-824187247/) 
+Any questions/comments/feedback/opinion about my work? Feel free to contact me! [(My Linkedin)](https://www.linkedin.com/in/alex-mak-824187247/) 
 
 
