@@ -48,8 +48,8 @@ An end-to-end ML app leveraging data science & AI/ML for **product analytics** a
 | **1. Product Analytics**                                  | Built ML models to **identify key profit-generating features**. |
 | **2. Profit Forecasting**                                 | Fine-tuned ML models to **predict product growth**. |
 | **3. Interactive Dashboards**                             | Highlight **actionable recommendations** & **hidden insights**.  |
-| **4. Customer Segmentation / Profiling / Churning**       | **Group customers** by applying clusters & study their characteristics. |
-| **5. Accessible Solutions**                               | Delivered all features in a **scalable app**, usable anytime. |
+| **4. Customer Segmentation / Profiling / Churning**       | Intelligently **group customers** with clusters & study them. |
+| **5. Accessible Solutions**                               | Delivered all features in a **scalable app**, ready anytime. |
 
 <br>
 
