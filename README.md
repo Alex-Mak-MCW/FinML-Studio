@@ -16,7 +16,7 @@ tags:
   <img src="App_Visualizations/Homepage_Icons/sidebar-icon.png" alt="App Icon" width="500">
 </p>
 
-An end-to-end ML app leveraging data science & AI/ML for **product analytics** and **business intelligence**.
+An end-to-end app leveraging data science & AI/ML for **product analytics** and **business intelligence**.
 
 <br>
 
