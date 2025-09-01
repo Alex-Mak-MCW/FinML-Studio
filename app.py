@@ -96,6 +96,13 @@ def daily_line_altair(df):
     merged = full.merge(day_counts, on="days_in_year", how="left")
     merged["Contacts Made"] = merged["Contacts Made"].fillna(0)
 
+    # --- compute quarter starts/ends and midpoints ---
+    q_starts = [start_day] + [e + 1 for e in q_ends]         # start of each quarter
+    q_ends_all = q_ends + [364]                               # end of each quarter
+    q_mids = [ (s + e) / 2 for s, e in zip(q_starts, q_ends_all) ]
+    q_labels = ["Q1", "Q2", "Q3", "Q4"]
+    qlabel_df = pd.DataFrame({"days_in_year": q_mids, "quarter": q_labels})
+
     # 4) Base line chart
     line = (
         alt.Chart(merged)
@@ -117,11 +124,26 @@ def daily_line_altair(df):
     quarter_rules = (
         alt.Chart(q_rules_df)
         .mark_rule(size=2, color="rgba(255,255,255,0.55)", strokeDash=[4, 4])
-        .encode(x="days_in_year:Q")
+        .encode(x=alt.X("days_in_year:Q"))
     )
 
-    # 6) Combine
-    chart = (line + quarter_rules).properties(
+    # 6) Quarter labels at exact midpoints (works for both 0- and 1-indexed)
+    quarter_labels = (
+        alt.Chart(qlabel_df)
+        .mark_text(
+            fontSize=14, fontWeight="bold", color="white",
+            # optional halo for readability:
+            # stroke="black", strokeWidth=3
+        )
+        .encode(
+            x=alt.X("days_in_year:Q", scale=alt.Scale(domain=[start_day, 364])),
+            y=alt.value(18),     # pin near top of plot; adjust if height changes
+            text="quarter:N",
+        )
+    )
+
+    # 7) Combine
+    chart = (line + quarter_rules + quarter_labels).properties(
         width="container",
         height=300,
         title="Daily Contacts Made Over a Year",
@@ -129,6 +151,7 @@ def daily_line_altair(df):
     ).configure_title(fontSize=18, anchor="start")
 
     return chart
+
 
 # plot monthly trend_line graph
 def monthly_line_altair(df):
@@ -195,10 +218,28 @@ def monthly_line_altair(df):
         )
     )
 
-    # 5) combine and style
-    chart = (line + labels + quarter_rules).properties(
+    # --- quarter labels (Q1..Q4) placed in the middle month of each partition ---
+    qlabel_df = pd.DataFrame({
+        "month_name": ["Feb", "May", "Aug", "Nov"],  # middle of each quarter
+        "quarter":    ["Q1",  "Q2",  "Q3",  "Q4"]
+    })
+
+    quarter_labels = (
+        alt.Chart(qlabel_df)
+        .mark_text(fontSize=14, fontWeight="bold", color="white", dy=0, dx=-28)
+        .encode(
+            x=alt.X("month_name:O", sort=names),
+            # Use a fixed screen position so the label sits near the top of the plot.
+            # Adjust this value if you change chart height.
+            y=alt.value(18),
+            text="quarter:N"
+        )
+        # .properties(title=None)
+    )
+
+    chart = (line + labels + quarter_rules + quarter_labels).properties(
         width="container", height=300, title="Monthly Contacts Made",
-        padding={"top": 20, "right": 0, "bottom": 0, "left": 0},  # ← add top padding
+        padding={"top": 20, "right": 0, "bottom": 0, "left": 0},
     ).configure_title(fontSize=18, anchor="start")
 
     return chart
@@ -206,9 +247,9 @@ def monthly_line_altair(df):
 # plot monthly success rate chart
 def monthly_success_altair(df):
     months = ["Jan","Feb","Mar","Apr","May","Jun",
-            "Jul","Aug","Sep","Oct","Nov","Dec"]
+              "Jul","Aug","Sep","Oct","Nov","Dec"]
 
-    # 1) Perform transformations
+    # 1) Transformations: month name, mean rate, percent
     base = (
         alt.Chart(df)
         .transform_calculate(
@@ -227,51 +268,61 @@ def monthly_success_altair(df):
     line = base.mark_line(interpolate="linear", point=True).encode(
         x=alt.X(
             "month_name:O",
-            sort=months,                    # enforce Jan→Dec
+            sort=months,
             title="Month",
-            axis=alt.Axis(labelAngle=360)
+            axis=alt.Axis(labelAngle=0)
         ),
-        y=alt.Y("rate_pct:Q", title="Success Rate (%)",  scale=alt.Scale(domain=[0, 60])),
+        y=alt.Y("rate_pct:Q", title="Success Rate (%)", scale=alt.Scale(domain=[0, 60])),
         tooltip=[
             alt.Tooltip("month_name:O", title="Month"),
             alt.Tooltip("rate_pct:Q", title="Success Rate", format=".1f")
         ]
     )
 
-    # 3) Data labels
-    labels = base.mark_text(
-        dy=-10,               # nudge text above each point
-        fontSize=12,
-        color="white"
-    ).encode(
+    # 3) Data labels over points
+    labels = base.mark_text(dy=-10, fontSize=12, color="white").encode(
         x=alt.X("month_name:O", sort=months),
         y="rate_pct:Q",
         text=alt.Text("rate_pct:Q", format=".1f")
     )
 
-    # 4) quarter boundary rules at end of Mar/Jun/Sep/Dec
-    #    Built from `base` so it already has data; works in Altair v4.
+    # 4) Quarter boundary rules at Mar/Jun/Sep/Dec (center of band in Altair v4)
     quarter_rules = (
         base
         .transform_filter(
-            alt.FieldOneOfPredicate(field="month_name",
-                                    oneOf=["Mar", "Jun", "Sep", "Dec"])
+            alt.FieldOneOfPredicate(field="month_name", oneOf=["Mar", "Jun", "Sep", "Dec"])
         )
         .mark_rule(size=2, color="rgba(255,255,255,0.25)", strokeDash=[4, 4])
+        .encode(x=alt.X("month_name:O", sort=months))
+    )
+
+    # 5) Quarter labels (Q1..Q4) at Feb/May/Aug/Nov, nudged left to sit between months
+    qlabel_df = pd.DataFrame({
+        "month_name": ["Feb", "May", "Aug", "Nov"],   # middle month of each quarter
+        "quarter":    ["Q1",  "Q2",  "Q3",  "Q4"]
+    })
+
+    quarter_labels = (
+        alt.Chart(qlabel_df)
+        .mark_text(
+            fontSize=14, fontWeight="bold", color="white",
+            dx=-28,          # ← nudge left (negative = left). Tweak to taste.
+            # Optional halo for readability on busy backgrounds:
+            # stroke="black", strokeWidth=3
+        )
         .encode(
-            x=alt.X("month_name:O", sort=months)
-            # NOTE: In Altair v4 this draws at the CENTER of the month band.
-            # If you later upgrade to Altair 5, add: bandPosition=1 to place it
-            # at the END of each month band (true quarter boundary).
+            x=alt.X("month_name:O", sort=months),
+            y=alt.value(18),     # fixed screen y near top; adjust if height changes
+            text="quarter:N"
         )
     )
 
-    # 5) Combine plot & data labels
-    chart = (line + labels + quarter_rules).properties(
+    # 6) Combine everything
+    chart = (line + labels + quarter_rules + quarter_labels).properties(
         width="container",
         height=300,
         title="Monthly Success Rate",
-        padding={"top": 20, "right": 0, "bottom": 0, "left": 0},  # ← add top padding
+        padding={"top": 20, "right": 0, "bottom": 0, "left": 0},
     ).configure_title(fontSize=18, anchor="start")
 
     return chart
@@ -538,7 +589,7 @@ def plot_loans_duration_heatmap(df, dur_start=0, dur_end=1200, dur_step=60):
       (heatmap_data["housing"] == 1) & (heatmap_data["loan"] == 0),  # housing only
       (heatmap_data["housing"] == 0) & (heatmap_data["loan"] == 1)   # personal only
     ]
-    choices = ["both_loans","no_loans","housing_loans","personal_loans"]
+    choices = ["Both Loans","No Loans","Housing Loans","Personal Loans"]
     heatmap_data["loans?"] = np.select(conditions, choices, default="unknown")
 
     # 3) Pivot + fill
@@ -1619,8 +1670,23 @@ def user_input_form_decision_tree():
     duration = st.slider("How long was the duration of your client's last campaign (in minutes)?", min_value=0, max_value=300, value=15, key=3)
     # campaign = st.slider("How many times did our bank contact you?", min_value=0, max_value=15, value=0, key=3)
     # pdays = st.slider("How many days ago when we last contacted you?", min_value=0, max_value=1000, value=5, key=4)
-    poutcome = st.selectbox("What is the outcome of your client' last campaign?", ["Unknown", "Failure", "Success"], index=0, key=4)  # Default value is 0
-    days_in_year = st.slider("What is the number of Days in a year did you contact your client?", min_value=0, max_value=365, value=day_of_year, key=5)
+    poutcome = st.selectbox("What is the outcome of your client's last campaign?", ["Unknown", "Failure", "Success"], index=0, key=4)  # Default value is 0
+    # days_in_year = st.slider("What is the number of Days in a year did you contact your client?", min_value=0, max_value=365, value=day_of_year, key=5)
+
+
+    year = datetime.date.today().year
+    # let the user pick a date
+    chosen_date = st.date_input(
+        "Pick the date you contacted your client",
+        value=datetime.date(year, 1, 1),  # default = Jan 1
+        min_value=datetime.date(year, 1, 1),
+        max_value=datetime.date(year, 12, 31),
+        key=5
+    )
+
+    # convert date → day-of-year number
+    days_in_year = (chosen_date - datetime.date(year, 1, 1)).days
+    print(days_in_year)
 
     
     # 4) Input Handling
@@ -1669,7 +1735,7 @@ def user_input_form_random_forest():
     st.markdown("<br>", unsafe_allow_html=True)
     # st.subheader('"Combining many Decision Trees and their Predictions into 1 Outcome"')
     st.markdown(
-        '<h3 style="color:#FFC107;">"<u>Combining many Decision Trees</u> and their Predictions into 1 Overall Outcome""</h3>',
+        '<h3 style="color:#FFC107;">"<u>Combining many Decision Trees</u> and their Predictions into 1 Overall Outcome"</h3>',
         unsafe_allow_html=True
     )
 
@@ -1715,14 +1781,27 @@ def user_input_form_random_forest():
     # days_in_year = st.slider("What is the number of Days in a year did you contact your client?", min_value=0, max_value=365, value=day_of_year, key=16)
 
     age = st.slider("What is your client's age (18-65)?", min_value=18, max_value=65, value=42, key=10)
-    balance = st.number_input("What is your client' bank account balance?", min_value=0, max_value=100000000, value=10000, key=11)
+    balance = st.number_input("What is your client's bank account balance?", min_value=0, max_value=100000000, value=10000, key=11)
     housing = st.selectbox("Does your client have any housing loans?", ["No", "Yes"], index=0, key=12)  # Default value is 0
     duration = st.slider("How long was the duration of your client's last campaign (in minutes)?", min_value=0, max_value=300, value=15, key=13)
     pdays = st.slider("How many days ago when we last contacted your client?", min_value=0, max_value=1000, value=5, key=14)
     poutcome = st.selectbox("What is the outcome of your client's last campaign?", ["Unknown", "Failure", "Success"], index=0, key=15)  # Default value is 0
     marital_married = st.selectbox("Is your client married?", ["No", "Yes"], index=0, key=16)  # Default value is 0
     job_blue_collar = st.selectbox("Does your client have a blue collor job?", ["No", "Yes"], index=0, key=17)  # Default value is 0
-    days_in_year = st.slider("What is the number of Days in a year did you contact your client?", min_value=0, max_value=365, value=day_of_year, key=18)
+    # days_in_year = st.slider("What is the number of Days in a year did you contact your client?", min_value=0, max_value=365, value=day_of_year, key=18)
+    year = datetime.date.today().year
+    # let the user pick a date
+    chosen_date = st.date_input(
+        "Pick the date you contacted your client",
+        value=datetime.date(year, 1, 1),  # default = Jan 1
+        min_value=datetime.date(year, 1, 1),
+        max_value=datetime.date(year, 12, 31),
+        key=18
+    )
+
+    # convert date → day-of-year number
+    days_in_year = (chosen_date - datetime.date(year, 1, 1)).days
+    print(days_in_year)
     
     # 4) input handling
     age = float(age)
@@ -2945,22 +3024,9 @@ def overview_page(data, preprocessed):
     
     # st.markdown("---")
 
-        # ————— Way 2: Brief narrative description —————
-    st.write("This page lets you download the dataset used for this app, including the original “raw” dataset or the “processed” data by utilizng the following techniques:") 
-    st.markdown(
-        """
-        <ol>
-            <li>Transform null data through <span style="color: #00BCD4;">data imputation</span></li>
-            <li>Applied different <span style="color: #00BCD4;">encoding techniques</span> (label encoding and one-hot encoding) to encode different categorical features</li>
-            <li><span style="color: #00BCD4;">Outlier detection and removal</span></li>
-            <li>Create new features with <span style="color: #00BCD4;">feature engineering</span> techniques</li>
-        </ol>
-        """,
-        unsafe_allow_html=True
-    )
+    # ————— Way 2: Brief narrative description —————
     st.markdown(
         f"""
-        <br>
         <p>
         This dataset collected the results of a Portuguese bank’s telemarketing campaign between May 2008 and November 2010, it is later shared to the UCI ML repository and it can be accessed here. <strong><a href="https://archive.ics.uci.edu/dataset/222/bank+marketing">(Link)</a></strong>
         </p>
@@ -2978,6 +3044,21 @@ def overview_page(data, preprocessed):
         unsafe_allow_html=True
     )
 
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    st.write("This page lets you download the dataset used for this app, including the original “raw” dataset or the “processed” data by utilizng the following techniques:") 
+    st.markdown(
+        """
+        <ol>
+            <li>Transform null data through <span style="color: #00BCD4;">data imputation</span></li>
+            <li>Applied different <span style="color: #00BCD4;">encoding techniques</span> (label encoding and one-hot encoding) to encode different categorical features</li>
+            <li><span style="color: #00BCD4;">Outlier detection and removal</span></li>
+            <li>Create new features with <span style="color: #00BCD4;">feature engineering</span> techniques</li>
+        </ol>
+        """,
+        unsafe_allow_html=True
+    )
+
 
     st.markdown("---")
 
@@ -2990,7 +3071,7 @@ def overview_page(data, preprocessed):
     st.markdown("<h2 style='color:#00BCD4;'>Data Preview</h2>",unsafe_allow_html=True)
     # st.subheader("Data Preview")
     cols_to_show = st.multiselect(
-        "Pick columns to preview:",
+        "Pick features to preview:",
         options=preprocessed.columns.tolist(),
         default=preprocessed.columns.tolist()[:5]
     )
