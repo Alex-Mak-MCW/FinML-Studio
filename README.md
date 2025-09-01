@@ -16,14 +16,14 @@ tags:
   <img src="App_Visualizations/Homepage_Icons/sidebar-icon.png" alt="App Icon" width="500">
 </p>
 
-End-to-end fintech app leveraging data science & AI/ML for **product analytics** and **business intelligence**.
+An end-to-end app leveraging data science & AI/ML for **product analytics** and **business intelligence**.
 
 <br>
 
 # 📑 Table of Contents
 - [Features](#features)
 - [Using the App](#using-the-app)
-- [Technial Stack](#technical-stack)
+- [Technical Stack](#technical-stack)
 - [Contact](#contact)
 
 <br>
@@ -45,29 +45,29 @@ End-to-end fintech app leveraging data science & AI/ML for **product analytics**
 
 | | |
 |---|---|
-| **1. Product Analytics**                                  | Used ML models to **find key profit-generating features**. |
+| **1. Product Analytics**                                  | Built ML models to **identify key profit-generating features**. |
 | **2. Profit Forecasting**                                 | Fine-tuned ML models to **predict product growth**. |
-| **3. Interactive Dashboards**                             | Highlight **actionable recommendations** & **hidden insights**.  |
-| **4. Customer Segmentation / Profiling / Churning**       | **Group customers** with clusters & analyze their characteristics. |
-| **5. Accessible Solutions**                               | All features are ready to be used in a **scalable app**! |
+| **3. Interactive Dashboards**                             | Highlight **actionable recommendations** & **insights**.  |
+| **4. Customer Segmentation & Churning**       | Intelligently **group customers** with clusters & study them. |
+| **5. Accessible Solutions**                               | Delivered all features in a **scalable app**, ready anytime. |
 
 <br>
-
-# Screenshots
 
 <p align="center">
   <img src="App_Visualizations/Homepage.png" alt="App Homepage" width="800">
 </p>
 
 ---
-<br>
 
 # Using the App
 
-### Method 1: Directly Access the App
-Visit my app on [Streamlit Community Cloud](#) or [Hugging Face Space](#)
-<br><br>
-### Method 2: Deploy it locally on your computer --> copy & paste the following command
+## Method 1: Directly Access the App
+### Visit my app on [Streamlit Community Cloud](https://alex-mak-mcw-finml-studio-app-tzhae8.streamlit.app/) or [Hugging Face Space](https://huggingface.co/spaces/Alex-Mak-MCW/FinML-Studio)!
+
+<br> 
+
+## Method 2: Deploy it locally on your computer 
+### Copy & paste the following command:
 ```bash
 git clone https://github.com/Alex-Mak-MCW/FinML-Studio
 cd Fin-ML-Studio
@@ -83,14 +83,13 @@ streamlit run app.py
 | **Data Processing**   | - **pandas, scipy, numpy** for data cleaning & feature engineering <br> - **imblearn** for handling class imbalance via data oversampling (SMOTE)|
 | **Data Analysis & Visualization** | - **Matplotlib, Seaborn** for standard charts <br> - **Plotly, Altair** for interactive visualization |
 | **Machine Learning**  | - **scikit-learn** for ML model development <br> - **hdbscan** for clustering algorithms <br> - **SHAP, LIME** for explainable AI (XAI) |
-| **MLOps & Deployment**| - **Streamlit** for interactive app development <br> - **Docker** for containerization |
+| **MLOps**| - **Streamlit** for interactive app development <br> - **Docker** for containerization |
+| **Deployment Platforms** | - **Streamlit Community Cloud** for rapid prototyping  <br> - **Hugging Face Spaces** for open-source demo & community visibility <br> - **AWS (EC2)** for dockerized and scalable deployment |
 | **Project Management**| - **GitHub Projects** for agile development & software development life cycle |
 
 <br>
 
 # Contact
-Any questions/comments/feedback/opinion about my work? Feel free to contact me!
-
-👉 [My Linkedin!](https://www.linkedin.com/in/alex-mak-824187247/) 
+Any questions/comments/feedback/opinion about my work? Feel free to contact me! [(My Linkedin)](https://www.linkedin.com/in/alex-mak-824187247/) 
 
 
