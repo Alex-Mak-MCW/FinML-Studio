@@ -756,37 +756,37 @@ def show_example_table(data, selected_cols):
     # 1) define your master mappings once:
     DESC = {
         "age":               "Age (whole number)",
-        "education":         "Education level (1=elementatry,2=secondary,3=post-secondary)",
-        "default":           "Previous default? (1=yes,0=no)",
-        "balance":           "bBank balance (decimal)",
+        "education":         "Education level (1=elementatry, 2=secondary, 3=post-secondary)",
+        "default":           "Previously default? (1=yes, 0=no)",
+        "balance":           "Bank balance (decimal number)",
         "contact_cellular":  "Contact channel is cellular phone? (1=yes,0=no)",
         "contact_telephone": "Contact channel is landline phone? (1=yes,0=no)",
-        "housing":           "Housing loan? (1=yes,0=no)",
-        "loan":              "Personal loan? (1=yes,0=no)",
-        "day":               "Day of month of last campaign (1–31)",
-        "month":             "Month of year of last campaign (1–12)",
-        "duration":          "Call duration in seconds",
-        "campaign":          "Times contacted this campaign (incl. this)",
-        "pdays":             "Days since last campaign (-1=first time)",
-        "previous":          "Times contacted before this campaign",
-        "poutcome":          "Outcome of previous campaign (failure/nonexistent/success)",
-        "marital_divorced":  "Divorced? (1=yes,0=no)",
-        "marital_married":   "Married? (1=yes,0=no)",
-        "marital_single":    "Single? (1=yes,0=no)",
-        "job_admin.":        "Working an administrative job? (1=yes,0=no)",
-        "job_blue_collar":   "Working a blue collar job? (1=yes,0=no)",
-        "job_entrepreneur":  "Working as a entrepreneur? (1=yes,0=no)",
-        "job_housemaid":     "Working as a housemaid? (1=yes,0=no)",
-        "job_management":    "Working in management? (1=yes,0=no)",
-        "job_retired":       "Retired? (1=yes,0=no)",
-        "job_self_employed": "Self-employed? (1=yes,0=no)",
-        "job_services":      "Work in the services industry? (1=yes,0=no)",
-        "job_student":       "Being a student? (1=yes,0=no)",
-        "job_technician":    "Work as a technician? (1=yes,0=no)",
-        "job_unemployed":    "Not working now? (1=yes,0=no)",
-        "job_unknown":       "Unknown jon? (1=yes,0=no)",
-        "days_in_year":      "Current day of year (1–366)",
-        "y":                 "Did the client subscribe the product? (1=yes,0=no) (Target Variable)",   # target, fill in later
+        "housing":           "Housing loan? (1=yes, 0=no)",
+        "loan":              "Personal loan? (1=yes, 0=no)",
+        "day":               "Day of month in the most recent marketing campaign (whole number: 1–31)",
+        "month":             "Month of year in the most recent marketing campaign (whole number: 1–12)",
+        "duration":          "Call duration in seconds (whole number)",
+        "campaign":          "Times contacted during this marketing campaign, including this time (whole number)",
+        "pdays":             "Days since last marketing campaign (whole number, -1=first time)",
+        "previous":          "Times contacted before this marketing campaign (whole number)",
+        "poutcome":          "Outcome of previous marketing campaign (failure/nonexistent/success)",
+        "marital_divorced":  "Divorced? (1=yes, 0=no)",
+        "marital_married":   "Married? (1=yes, 0=no)",
+        "marital_single":    "Single? (1=yes, 0=no)",
+        "job_admin.":        "Working an administrative job? (1=yes, 0=no)",
+        "job_blue_collar":   "Working a blue collar job? (1=yes, 0=no)",
+        "job_entrepreneur":  "Working as a entrepreneur? (1=yes, 0=no)",
+        "job_housemaid":     "Working as a housemaid? (1=yes, 0=no)",
+        "job_management":    "Working in management? (1=yes, 0=no)",
+        "job_retired":       "Retired? (1=yes, 0=no)",
+        "job_self_employed": "Self-employed? (1=yes, 0=no)",
+        "job_services":      "Work in the services industry? (1=yes, 0=no)",
+        "job_student":       "Being a student? (1=yes, 0=no)",
+        "job_technician":    "Work as a technician? (1=yes, 0=no)",
+        "job_unemployed":    "Not working now? (1=yes, 0=no)",
+        "job_unknown":       "Unknown job? (1=yes, 0=no)",
+        "days_in_year":      "Current day of year (whole number: 1–366)",
+        "y":                 "Did the client subscribed the product (term deposit)? (1=yes, 0=no) (TARGET VARIABLE)",   # target, fill in later
     }
 
     EX = {
@@ -855,7 +855,7 @@ def show_cluster_feature_means_raw(data, selected_cols):
 
     # ─── Cluster Means & Δ-Means Tables ───────────────────────────────
     st.markdown(
-        f"""<h2>{"<span style='color:#00BCD4;'>Customer Groups' Feature Means Table</span>"}</h2>""",
+        f"""<h2>{"<span style='color:#00BCD4;'>Customer Groups' Feature Averages Table</span>"}</h2>""",
         unsafe_allow_html=True
     )
     # st.subheader("For Regular Means:")
@@ -1095,7 +1095,7 @@ def show_shap_explanation_custom(
     st.markdown(
         f"""<p><strong>Predicted Customer Group:</strong> 
         <span style='color:#FFC107 !important;'><u>{label}</u></span> 
-        (probability=<span style='color:#FFC107 !important;'><u>{proba*100:.2f}%</u></span>)</p>""",
+        (probability = <span style='color:#FFC107 !important;'><u>{proba*100:.2f}%</u></span>)</p>""",
         unsafe_allow_html=True
     )
 
@@ -1155,8 +1155,8 @@ def show_lime_explanation_custom(
 
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown(
-        "<h3><span style='color:#00BCD4;'>Adjust the values for your client. "
-        "Use the Table Above to Refer to the Right Features</span></h3>",
+        "<h3><span style='color:#00BCD4;'>Adjust the Values for Your Client. "
+        "(Use the Table Above to Refer to the Right Features)</span></h3>",
         unsafe_allow_html=True
     )
 
@@ -1204,7 +1204,7 @@ def show_lime_explanation_custom(
         msg = (
             "Predicted Outcome: "
             f"<span style='color:#FFC107;'>{label_map[pred_label]}</span>, "
-            "(probability= "
+            "(Probability = "
             f"<span style='color:#FFC107;'>{rf_model.predict_proba(scaled_pt)[0][pred_index]*100:.0f}%</span>)"
         )
         st.markdown(f"<h2>{msg}</h2>", unsafe_allow_html=True)
@@ -1264,7 +1264,7 @@ def show_lime_explanation_custom(
 # Function that plots 3D Scatter on Raw
 def plot_3d_clusters_raw(data, selected_cols, top_features):
     st.markdown(
-        f"""<h2>{'<span style="color:#00BCD4;">3D Cluster Visualization</span>'}</h2>""",
+        f"""<h2>{'<span style="color:#00BCD4;">3D View of Customer Groups (& Outliers)</span>'}</h2>""",
         unsafe_allow_html=True
     )
     # st.header("3D Cluster Visualization")
@@ -1292,7 +1292,7 @@ def plot_3d_clusters_raw(data, selected_cols, top_features):
 
     # map each row’s numeric cluster to its new label
     df = data.copy()
-    df["Cluster_label"] = df["Cluster"].map(label_map)
+    df["Cluster Label"] = df["Cluster"].map(label_map)
 
     # pick a palette
     palette = px.colors.qualitative.Plotly
@@ -1302,10 +1302,10 @@ def plot_3d_clusters_raw(data, selected_cols, top_features):
     fig3d = px.scatter_3d(
         df,
         x=top3[0], y=top3[1], z=top3[2],
-        color="Cluster_label",
-        category_orders={"Cluster_label": ordered_labels},
+        color="Cluster Label",
+        category_orders={"Cluster Label": ordered_labels},
         color_discrete_map=color_map,
-        title="3D view of Customer Groups & Outliers",
+        # title="3D view of Customer Groups & Outliers",
         width=750, height=750
     )
     st.plotly_chart(fig3d)
@@ -2151,9 +2151,9 @@ def home_page(models, data, raw_data):
 
     cards = [
         (
-            "Subscription Prediction",
-            "Use fine-tuned AI/ML models to predict will a client subscribe the product!",
-            "Deposit Subscription Prediction",
+            "Deposit Prediction",
+            "Use fine-tuned AI/ML models to predict will a client deposit or not!",
+            "Deposit Prediction",
             f"{cloud_deployment}App_Visualizations/Homepage_Icons/predictive-icon.jpg"
         ),
         (
@@ -2924,9 +2924,9 @@ def clustering_page(data):
 
         # build your message
         if has_outliers:
-            msg = f"There are <span style='color: #FFC107;'>{num_clusters} customer groups</span> (and <span style='color:#FFC107;'>1 outliers group</span>)."
+            msg = f"There are <span style='color: #FFC107;'>{num_clusters} Customer Groups</span> (and <span style='color:#FFC107;'>1 Outliers Group</span>)."
         else:
-            msg = f"There are <span style='color:#FFC107;'>{num_clusters} customer groups</span>."
+            msg = f"There are <span style='color:#FFC107;'>{num_clusters} Customer Groups</span>."
 
         st.markdown(f"<h2>{msg}</h2>", unsafe_allow_html=True)
         # if has_outliers:
@@ -3188,7 +3188,7 @@ def acknowledgement_page(data):
 # global dictionary to link page and index
 PAGE_TO_INDEX = {
     "Home":                              0,
-    "Deposit Subscription Prediction":  1,
+    "Deposit Prediction":  1,
     "Interactive Dashboard":            2,
     "Customer Segmentation":            3,
     "Data Overview & Export":           4,
@@ -3359,7 +3359,7 @@ def main():
     # page navigation based on user's selection
     if page == "Home":
         home_page(models, data, raw_data)
-    elif page == "Deposit Subscription Prediction":
+    elif page == "Deposit Prediction":
         prediction_page(models, data)
     elif page == "Interactive Dashboard":
         dashboard_page(data)
