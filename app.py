@@ -476,7 +476,7 @@ def kde_age_distribution(df, field="age", filter_col="y", filter_val=1, bandwidt
         .properties(
             width="container",
             height=350,
-            title="Age Distribution over Wins (KDE)",
+            title="Age Distribution over Wins",
             padding={"top": 20, "right": 0, "bottom": 0, "left": 0},  # ← add top padding
         )
         .configure_title(fontSize=18, anchor="start")
@@ -670,15 +670,17 @@ def previous_donut(df, width, height, filter_col="poutcome", filter_val=1):
         textfont=dict(color=["white", "white"], size=14)
     ))
 
+    fig_title = "Proportion of Campaign Outcome"
+
     # Title by filter value
-    if filter_val == 0:
-        fig_title = "Proportion of Campaign Outcome when it Failed"
-    elif filter_val == 0.5:
-        fig_title = "Proportion of Campaign Outcome when it was Inconclusive"
-    elif filter_val == 1:
-        fig_title = "Proportion of Campaign Wins when it Succeeded"
-    else:
-        fig_title = "Campaign Outcome Proportions"
+    # if filter_val == 0:
+    #     fig_title = "Proportion of Campaign Outcome"
+    # elif filter_val == 0.5:
+    #     fig_title = "Proportion of Campaign Outcome"
+    # elif filter_val == 1:
+    #     fig_title = "Proportion of Campaign Outcome"
+    # else:
+    #     fig_title = "Proportion of Campaign Outcome"
 
     # Styling to match your pie helper (tight top gap + fixed size)
     fig.update_traces(marker=dict(line=dict(width=1, color="white")))
@@ -1431,7 +1433,7 @@ def show_explanations(model, inputs, shap_explainer, lime_explainer, max_lime_fe
     {lime_html}
     </div>
     """
-    components.html(wrapper, height=250)
+    components.html(wrapper, height=300)
 
 
     # components.html(lime_exp.as_html(), height=350)
@@ -2125,7 +2127,7 @@ def home_page(models, data, raw_data):
             <span style="color:#00BCD4;">data science</span> 
             and 
             <span style="color:#00BCD4;">machine learning</span> 
-            methodologies to improve the performance of a bank financial product, especially in the areas of:
+            methodologies to improve the performance of a bank financial product <span style="color:#00BCD4;">(term deposit)</span>, especially in the areas of:
         </p>
         """,
         unsafe_allow_html=True
@@ -2142,7 +2144,7 @@ def home_page(models, data, raw_data):
     )
 
     st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown('<p class="card-desc">Come pick a box below to get started!</p>', unsafe_allow_html=True)
+    st.markdown('<p class="card-desc">Come try the functionalities below!</p>', unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
     # for local deployment
 
@@ -2152,7 +2154,7 @@ def home_page(models, data, raw_data):
     cards = [
         (
             "Deposit Prediction",
-            "Use fine-tuned AI/ML models to predict will a client deposit or not!",
+            "Use fine-tuned AI/ML models to predict whether a client will deposit or not!",
             "Deposit Prediction",
             f"{cloud_deployment}App_Visualizations/Homepage_Icons/predictive-icon.jpg"
         ),
@@ -2164,7 +2166,7 @@ def home_page(models, data, raw_data):
         ),
         (
             "Customer Segmentation",
-            "Intelligently assign customers into groups with our clustering algorithm!",
+            "Assign customers into groups with our clustering algorithm!",
             "Customer Segmentation",
             f"{cloud_deployment}App_Visualizations/Homepage_Icons/cluster-analysis-icon.jpg"
         ),
@@ -2458,21 +2460,30 @@ def dashboard_page(data):
 
     # sub function: visually shows KPIs
     def kpi_indicator(label, value, suffix="", color="#000000"):
+        # If suffix is "$", switch to prefix
+        if suffix == "$":
+            prefix = "$ "
+            suffix = ""
+        else:
+            prefix = ""
+
         fig = go.Figure(go.Indicator(
             mode="number",
             value=value,
             title={
                 "text": label,
-                "font": {"size": 20, "color": "#FFFFFF"}      # title in your colour
+                "font": {"size": 20, "color": "#FFFFFF"}
             },
             number={
-                "font": {"size": 48, "color": color},     # number in your colour
+                "font": {"size": 48, "color": color},
+                "prefix": prefix,
                 "suffix": suffix
             },
-            domain={"x": [0.3,0.6], "y": [0.3,0.4]}
+            domain={"x": [0.3, 0.6], "y": [0.3, 0.4]}
         ))
+
         fig.update_layout(
-            paper_bgcolor="rgba(0,0,0,0)",  
+            paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             margin=dict(l=0, r=0, t=0, b=0),
             height=90
@@ -2560,7 +2571,7 @@ def dashboard_page(data):
     # Col 4: First Contact %
     with k4:
         st.markdown('<div class="kpi-card">', unsafe_allow_html=True)
-        fig = kpi_indicator("First Contact %", round((data['previous']==0).mean()*100,2), "%", color="#FFC107")#FFB6C1
+        fig = kpi_indicator("First Contact Proportion", round((data['previous']==0).mean()*100,2), "%", color="#FFC107")#FFB6C1
         st.plotly_chart(fig, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -2570,7 +2581,7 @@ def dashboard_page(data):
         if persona == 'Marketing Manager':
             fig = kpi_indicator(
                 "Avg. Balance for Success",
-                round(data[data['y']==1]['balance'].mean(),2), color="#FFC107"
+                round(data[data['y']==1]['balance'].mean(),2), "$", color="#FFC107"
             )#abdbe3
         else:
             fig = kpi_indicator(
@@ -2677,7 +2688,7 @@ def dashboard_page(data):
             )
             # st.subheader("Distributions & Heatmaps Over Wins")
             dist_tab, heat_tab, loan_heat_tab = st.tabs([
-                "Age Distribution Over Wins","Age×Duration Heatmap","Loan×Duration Heatmap"
+                "Age Distribution Over Wins","Age × Duration Heatmap","Loan × Duration Heatmap"
             ])
 
             with dist_tab:
