@@ -321,7 +321,7 @@ def monthly_success_altair(df):
     chart = (line + labels + quarter_rules + quarter_labels).properties(
         width="container",
         height=300,
-        title="Monthly Success Rate",
+        title="Monthly Win Rate",
         padding={"top": 20, "right": 0, "bottom": 0, "left": 0},
     ).configure_title(fontSize=18, anchor="start")
 
@@ -360,7 +360,7 @@ def contact_channel_pie(df, width, height, filter_col="y", filter_val=1):
     fig.update_traces(marker=dict(line=dict(width=1, color="white")))
     fig.update_layout(
         title=dict(
-            text="Wins per Contact Channel ",
+            text="Wins Per Contact Channel ",
             pad=dict(t=-10),  # reduce top padding
             font=dict(size=16)
         ),
@@ -430,7 +430,7 @@ def plot_loan_venn(
             fontsize=7 * fscale, color="white", fontweight="bold", alpha=1,
             transform=ax.transAxes)
 
-    ax.set_title("Wins per Loan Ownership",
+    ax.set_title("Wins Per Loan Ownership",
                  color="white", fontweight="bold", fontsize=8 * fscale, pad=2)
 
     for spine in ax.spines.values(): spine.set_visible(False)
@@ -848,7 +848,18 @@ def show_example_table(data, selected_cols):
     fi.index = range(1, len(fi) + 1)
 
     # 5) Display
-    st.table(fi)
+    # st.table(fi)
+
+    st.dataframe(
+        fi,
+        hide_index=True,              # remove row numbers
+        use_container_width=True,     # fill the column space
+        column_config={
+            "Feature":      st.column_config.TextColumn(width="medium"),
+            "Description":  st.column_config.TextColumn(width="large"),
+            "Example":      st.column_config.TextColumn(width="small"),
+        },
+    )
 
 
 
@@ -857,11 +868,14 @@ def show_cluster_feature_means_raw(data, selected_cols):
 
     # ─── Cluster Means & Δ-Means Tables ───────────────────────────────
     st.markdown(
-        f"""<h2>{"<span style='color:#00BCD4;'>Customer Groups' Feature Averages Table</span>"}</h2>""",
+        f"""<h4>{"<span style='color:#00BCD4;'>Feature Averages Among Groups</span>"}</h4>""",
         unsafe_allow_html=True
     )
     # st.subheader("For Regular Means:")
-    cluster_means = data.groupby("Cluster")[selected_cols].mean().round(2)
+
+    data.rename(columns={"Cluster": "Groups"}, inplace=True)
+
+    cluster_means = data.groupby("Groups")[selected_cols].mean().round(2)
     overall_mean  = data[selected_cols].mean()
     delta_means   = (cluster_means.subtract(overall_mean, axis=1)).round(2)
 
@@ -875,11 +889,11 @@ def show_cluster_feature_means_raw(data, selected_cols):
         new_order = [lab for lab in cluster_means.index if lab != "Outliers"] + ["Outliers"]
         cluster_means = cluster_means.loc[new_order]
 
-    delta_means.index   = delta_means.index.map(make_label)
-    if "Outliers" in delta_means.index:
-        # build a new index order: everything except Outliers, then Outliers
-        new_order = [lab for lab in delta_means.index if lab != "Outliers"] + ["Outliers"]
-        delta_means = delta_means.loc[new_order]
+    # delta_means.index   = delta_means.index.map(make_label)
+    # if "Outliers" in delta_means.index:
+    #     # build a new index order: everything except Outliers, then Outliers
+    #     new_order = [lab for lab in delta_means.index if lab != "Outliers"] + ["Outliers"]
+    #     delta_means = delta_means.loc[new_order]
 
     # Define which columns should be int vs float
     int_cols = ["age", "day", "duration", "pdays", "days_in_year", "campaign", "contact_telephone"]
@@ -948,7 +962,7 @@ def plot_violin_top_features_raw(data, selected_cols, top_n=3):
 # Function that plots Tree-Based Importance to show importance of each factor
 def plot_tree_feature_importance(data, X_scaled, selected_cols, top_n=5):
     st.markdown(
-        f"""<h2>{'<span style="color:#00BCD4;">Important Factors That Formed the Customer Groups (& Outliers)</span>'}</h2>""",
+        f"""<h4>{'<span style="color:#00BCD4;">Crucial Factors Forming the Groups</span>'}</h4>""",
         unsafe_allow_html=True
     )
     # st.header("Important Factors That Formed the Customer Groups (& Outliers)")
@@ -979,7 +993,7 @@ def plot_tree_feature_importance(data, X_scaled, selected_cols, top_n=5):
 
             # 3) Create a smaller figure on a light-grey background
             fig, ax = plt.subplots(
-                figsize=(8, 4),            # smaller width x height
+                figsize=(8, 5),            # smaller width x height
             )
             light_bg = "#f5f5f5"
             fig.patch.set_facecolor(light_bg)
@@ -1002,7 +1016,7 @@ def plot_tree_feature_importance(data, X_scaled, selected_cols, top_n=5):
 
             # 6) Style axes & title with dark text
             title = ("Outliers" if cl == -1 else f"Customer Group {cl+1}")
-            ax.set_title(f"Top {top_n} Important Features for {title}", color="#333", fontsize=8)
+            ax.set_title(f"Top {top_n} Crucial Features for {title} & their Importance Score", color="#333", fontsize=8)
             ax.set_xlabel("Features", color="#333", fontsize=8)
             ax.set_ylabel("Importance Score", color="#333", fontsize=8)
             ax.tick_params(colors="#333", size=4)
@@ -1156,11 +1170,11 @@ def show_lime_explanation_custom(
     form_id = st.session_state.lime_form_id
 
     st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown(
-        "<h3><span style='color:#00BCD4;'>Adjust the Values for Your Client. "
-        "(Use the Table Above to Refer to the Right Features)</span></h3>",
-        unsafe_allow_html=True
-    )
+    # st.markdown(
+    #     "<h4><span style='color:#00BCD4;'>Adjust the Values for Your Client. "
+    #     "(Use the Table Above to Refer to the Right Features)</span></h4>",
+    #     unsafe_allow_html=True
+    # )
 
     # 1) Identify top-n features by RF importance
     importances = pd.Series(rf_model.feature_importances_, index=selected_cols)
@@ -1186,8 +1200,9 @@ def show_lime_explanation_custom(
                     feat, int(lo), int(hi), int(default), step=1, format="%d", key=slider_key
                 )
 
-        submit = st.form_submit_button("🔍 Run Customer Group Assignment Prediction")
-
+        st.markdown("<br>", unsafe_allow_html=True)
+        submit = st.form_submit_button("🔍 Run Customer Group Assignment Prediction", use_container_width=True)
+        
     # 3) Only on submit do you build & show result
     if not submit:
         return
@@ -1203,21 +1218,29 @@ def show_lime_explanation_custom(
         pred_index = sk_classes.index(pred_label)
         label_map = {cid: ("Outliers" if cid == -1 else f"Customer Group {cid+1}") for cid in sk_classes}
 
-        msg = (
-            "Predicted Outcome: "
-            f"<span style='color:#FFC107;'>{label_map[pred_label]}</span>, "
-            "(Probability = "
-            f"<span style='color:#FFC107;'>{rf_model.predict_proba(scaled_pt)[0][pred_index]*100:.0f}%</span>)"
-        )
-        st.markdown(f"<h2>{msg}</h2>", unsafe_allow_html=True)
-        st.markdown("---")
-
-    # 5) Add a reset button to start fresh
-    col1, col2 = st.columns([1, 3])
-    with col1:
-        if st.button("🔁 Try a new prediction"):
-            st.session_state.lime_form_id += 1  # bump the form id to reset widget state
-            st.rerun()  # reload page so defaults take effect
+        output_col1, output_col2= st.columns ([7,3], gap="large")
+        with output_col1:
+            msg = (
+                "Predicted Outcome: "
+                f"<span style='color:#FFC107;'>{label_map[pred_label]}</span>, "
+                "(Probability = "
+                f"<span style='color:#FFC107;'>{rf_model.predict_proba(scaled_pt)[0][pred_index]*100:.0f}%</span>)"
+            )
+            st.markdown(f"<h2>{msg}</h2>", unsafe_allow_html=True)
+            # st.markdown("---")
+        with output_col2:
+            st.markdown("""
+            <style>
+            /* Push down all buttons inside the second output column */
+            div[data-testid="column"]:nth-of-type(2) div.stButton > button {
+                margin-top: 2rem;   /* increase until it looks good */
+            }
+            </style>
+            """, unsafe_allow_html=True)
+            # 5) Add a reset button to start fresh
+            if st.button("🔁 Try a new prediction", use_container_width=True):
+                st.session_state.lime_form_id += 1  # bump the form id to reset widget state
+                st.rerun()  # reload page so defaults take effect
 
     # Note: If the user does NOT click reset, they can keep tweaking the sliders and re-submitting.
 
@@ -1266,7 +1289,7 @@ def show_lime_explanation_custom(
 # Function that plots 3D Scatter on Raw
 def plot_3d_clusters_raw(data, selected_cols, top_features):
     st.markdown(
-        f"""<h2>{'<span style="color:#00BCD4;">3D View of Customer Groups (& Outliers)</span>'}</h2>""",
+        f"""<h4>{'<span style="color:#00BCD4;">3D View of Customer Groups (& Outliers)</span>'}</h4>""",
         unsafe_allow_html=True
     )
     # st.header("3D Cluster Visualization")
@@ -1308,7 +1331,7 @@ def plot_3d_clusters_raw(data, selected_cols, top_features):
         category_orders={"Cluster Label": ordered_labels},
         color_discrete_map=color_map,
         # title="3D view of Customer Groups & Outliers",
-        width=750, height=750
+        width=200, height=550
     )
     st.plotly_chart(fig3d)
 
@@ -1616,20 +1639,20 @@ def user_input_form_decision_tree():
     st.markdown("<br>", unsafe_allow_html=True)
     # st.subheader('"A Tree-based Model that Makes Decisions by Splitting Data Repeatedly on Feature Values"')
     st.markdown(
-        '<h3 style="color:#FFC107;">"A Tree-based Model that Makes Decisions by <u>Splitting Data Repeatedly on Feature Values</u>"</h3>',
+        '<h3 style="color:#FFC107;">"A Tree-based AI Model that Makes Decisions by <u>Splitting Data Repeatedly on Feature Values</u>"</h3>',
         unsafe_allow_html=True
     )
 
     # 1) Build the pros/cons table
     dt_pros_cons_df = pd.DataFrame({
-        "Strengths:": [
+        "Strengths": [
             "🔍  Highly Interpretable",
-            "🧩  Can Handle Mixed Data",
-            "🛡️  Robust to outliers"
+            "🧩  Can Handle Mixed Data Types",
+            "🛡️  Robust to Outliers"
         ],
-        "Weaknesses:": [
+        "Weaknesses": [
             "⚠️  Prone to Overfitting",
-            "📉  High variance",
+            "📉  High Variance",
             "🌪️  Instability"
         ]
     })
@@ -1638,7 +1661,16 @@ def user_input_form_decision_tree():
     # dt_pros_cons_df.index = [''] * len(dt_pros_cons_df)
     # 2) Display it at the top
 
-    st.table(dt_pros_cons_df)            # static table :contentReference[oaicite:12]{index=12}
+    # st.table(dt_pros_cons_df)            # static table :contentReference[oaicite:12]{index=12}
+    st.dataframe(
+        dt_pros_cons_df,
+        column_config={
+            "Strengths": st.column_config.TextColumn(width="medium"),
+            "Weaknesses": st.column_config.TextColumn(width="medium"),
+        },
+        hide_index=True,
+        use_container_width=True
+    )
     # st.dataframe(pros_cons_df, use_container_width=True)  # interactive alternative :contentReference[oaicite:13]{index=13}
     # st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown("---")
@@ -1669,17 +1701,17 @@ def user_input_form_decision_tree():
     age = st.slider("What is your client's age (18-65)?", min_value=18, max_value=65, value=42, key=0)
     balance = st.number_input("What is your client's bank account balance?", min_value=0, max_value=100000000, value=10000, key=1)
     housing = st.selectbox("Does your client have any housing loans?", ["No", "Yes"], index=0, key=2)  # Default value is 0
-    duration = st.slider("How long was the duration of your client's last campaign (in minutes)?", min_value=0, max_value=300, value=15, key=3)
+    duration = st.slider("How long was your client contacted (in minutes)?", min_value=0, max_value=300, value=15, key=3)
     # campaign = st.slider("How many times did our bank contact you?", min_value=0, max_value=15, value=0, key=3)
     # pdays = st.slider("How many days ago when we last contacted you?", min_value=0, max_value=1000, value=5, key=4)
-    poutcome = st.selectbox("What is the outcome of your client's last campaign?", ["Unknown", "Failure", "Success"], index=0, key=4)  # Default value is 0
+    poutcome = st.selectbox("What was the outcome of your client was previosuly approached?", ["Unknown", "Failure", "Success"], index=0, key=4)  # Default value is 0
     # days_in_year = st.slider("What is the number of Days in a year did you contact your client?", min_value=0, max_value=365, value=day_of_year, key=5)
 
 
     year = datetime.date.today().year
     # let the user pick a date
     chosen_date = st.date_input(
-        "Pick the date you contacted your client",
+        "Pick the date your client was last contacted:",
         value=datetime.date(year, 1, 1),  # default = Jan 1
         min_value=datetime.date(year, 1, 1),
         max_value=datetime.date(year, 12, 31),
@@ -1743,12 +1775,12 @@ def user_input_form_random_forest():
 
     # 1) Build the pros/cons table
     rf_pros_cons_df = pd.DataFrame({
-        "Pros": [
+        "Strengths": [
             "🌲  Less Likely to Overfit",
             "📊  Handles High-dimensional Data Well",
             "🛡️  Robust to Noise & Outliers"
         ],
-        "Cons": [
+        "Weaknesses": [
             "🔍  Less Interpretable than Decision Tree",
             "💾  Higher Memory Usage",
             "🐢  Slower Predictions"
@@ -1757,7 +1789,16 @@ def user_input_form_random_forest():
     # rf_pros_cons_df.index = [''] * len(rf_pros_cons_df)
     rf_pros_cons_df.index = [1, 2, 3]
     # 2) Display it at the top
-    st.table(rf_pros_cons_df)            # static table :contentReference[oaicite:12]{index=12}
+    # st.table(rf_pros_cons_df)            # static table :contentReference[oaicite:12]{index=12}
+    st.dataframe(
+        rf_pros_cons_df,
+        column_config={
+            "Strengths": st.column_config.TextColumn(width="medium"),
+            "Weaknesses": st.column_config.TextColumn(width="medium"),
+        },
+        hide_index=True,
+        use_container_width=True
+    )
     # st.dataframe(pros_cons_df, use_container_width=True)  # interactive alternative :contentReference[oaicite:13]{index=13}
     # st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown("---")
@@ -1785,16 +1826,16 @@ def user_input_form_random_forest():
     age = st.slider("What is your client's age (18-65)?", min_value=18, max_value=65, value=42, key=10)
     balance = st.number_input("What is your client's bank account balance?", min_value=0, max_value=100000000, value=10000, key=11)
     housing = st.selectbox("Does your client have any housing loans?", ["No", "Yes"], index=0, key=12)  # Default value is 0
-    duration = st.slider("How long was the duration of your client's last campaign (in minutes)?", min_value=0, max_value=300, value=15, key=13)
-    pdays = st.slider("How many days ago when we last contacted your client?", min_value=0, max_value=1000, value=5, key=14)
-    poutcome = st.selectbox("What is the outcome of your client's last campaign?", ["Unknown", "Failure", "Success"], index=0, key=15)  # Default value is 0
+    duration = st.slider("How long was your client contacted (in minutes)?", min_value=0, max_value=300, value=15, key=13)
+    pdays = st.slider("How many days ago when your client was contacted?", min_value=0, max_value=1000, value=5, key=14)
+    poutcome = st.selectbox("What was the outcome of your client was previosuly approached?", ["Unknown", "Failure", "Success"], index=0, key=15)  # Default value is 0
     marital_married = st.selectbox("Is your client married?", ["No", "Yes"], index=0, key=16)  # Default value is 0
     job_blue_collar = st.selectbox("Does your client have a blue collor job?", ["No", "Yes"], index=0, key=17)  # Default value is 0
     # days_in_year = st.slider("What is the number of Days in a year did you contact your client?", min_value=0, max_value=365, value=day_of_year, key=18)
     year = datetime.date.today().year
     # let the user pick a date
     chosen_date = st.date_input(
-        "Pick the date you contacted your client",
+        "Pick the date your client was last contacted:",
         value=datetime.date(year, 1, 1),  # default = Jan 1
         min_value=datetime.date(year, 1, 1),
         max_value=datetime.date(year, 12, 31),
@@ -1869,21 +1910,30 @@ def user_input_form_xgboost():
 
     # 1) Build the pros/cons table
     xgb_pros_cons_df = pd.DataFrame({
-        "Pros": [
+        "Strengths": [
             "⚡  Most Powerful",
             "🔧  Self Correcting & Tuning",
             "☁️  Handles Missing Values Natively"
         ],
-        "Cons": [
+        "Weaknesses": [
             "👓  Least Interpretable",
             "⏳  Longer Training Ttimes",
             "🛠️  Harder to Optimize"
         ]
     })
-    xgb_pros_cons_df.index = [''] * len(xgb_pros_cons_df)
+    # xgb_pros_cons_df.index = [''] * len(xgb_pros_cons_df)
     xgb_pros_cons_df.index = [1, 2, 3]
     # 2) Display it at the top
-    st.table(xgb_pros_cons_df)            # static table :contentReference[oaicite:12]{index=12}
+    # st.table(xgb_pros_cons_df)            # static table :contentReference[oaicite:12]{index=12}
+    st.dataframe(
+        xgb_pros_cons_df,
+        column_config={
+            "Strengths": st.column_config.TextColumn(width="medium"),
+            "Weaknesses": st.column_config.TextColumn(width="medium"),
+        },
+        hide_index=True,
+        use_container_width=True
+    )
     # st.dataframe(pros_cons_df, use_container_width=True)  # interactive alternative :contentReference[oaicite:13]{index=13}
     # st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown("---")
@@ -1915,15 +1965,15 @@ def user_input_form_xgboost():
 
     housing = yes_no_mapping[st.selectbox("Does your client have any housing loans?", ["No", "Yes"], index=0, key=20)]
     loan = yes_no_mapping[st.selectbox("Do your client have any personal loans?", ["No", "Yes"], index=0, key=21)]
-    duration = st.slider("What is the duration of your client's last campaign (in minutes)?", min_value=0, max_value=300, value=15, key=22)
-    poutcome = st.selectbox("What is the outcome of your client's last campaign?", ["Unknown", "Failure", "Success"], index=0, key=23)  # Default value is 0
+    duration = st.slider("How long was your client contacted (in minutes)?", min_value=0, max_value=300, value=15, key=22)
+    poutcome = st.selectbox("What was the outcome of your client was previosuly approached?", ["Unknown", "Failure", "Success"], index=0, key=23)  # Default value is 0
     contact_cellular = yes_no_mapping[st.selectbox("Do you contact your client based on his/her cellphone?", ["No", "Yes"], index=0, key=24)]
     # marital_single = yes_no_mapping[st.selectbox("Is your client single?", ["No", "Yes"], index=0, key=25)]
     # marital_married = yes_no_mapping[st.selectbox("Is your client married?", ["No", "Yes"], index=0, key=25)]
     # marital_divorced = yes_no_mapping[st.selectbox("Is your client divorced?", ["No", "Yes"], index=0, key=25)]
 
     marital_overall = st.selectbox("What is your client's marital status?", ["Single", "Married", "Divorced"], index=0, key=25)  # Default value is 0
-    job_overall = st.selectbox("What does your client work as?", ["Unknown", "Blue Collar", "Management", "Services", "Technician"], index=0, key=26)  # Default value is 0
+    job_overall = st.selectbox("What is your client's job?", ["Unknown", "Blue Collar", "Management", "Services", "Technician"], index=0, key=26)  # Default value is 0
 
     # job_blue_collar = yes_no_mapping[st.selectbox("Does your client have a blue collar job?", ["No", "Yes"], index=0, key=26)]
     # job_management = yes_no_mapping[st.selectbox("Does your client have a management job?", ["No", "Yes"], index=0, key=26)]
@@ -2058,7 +2108,7 @@ def home_page(models, data, raw_data):
         <style>
         /* Match card titles with sidebar nav‐link font: */
         .card-title {
-        font-size: 1.125rem !important;  /* e.g. 18px if nav‐link is 18px */
+        font-size: 1.25rem !important;  /* e.g. 18px if nav‐link is 18px */
         margin: 0 0 8px 0;
         color: #fff !important;
         }
@@ -2097,7 +2147,7 @@ def home_page(models, data, raw_data):
         .block-container { padding-top: 0rem; } /* tweak 0–1rem to taste */
 
         /* give page titles a predictable gap from whatever is above them */
-        h1.page-title { margin-top: -2rem; margin-bottom: 0.75rem; font-size: 7em }
+        h1.page-title { margin-top: -3.5rem; margin-bottom: 0rem; font-size: 7.5em }
         </style>
         """,
         unsafe_allow_html=True
@@ -2113,9 +2163,9 @@ def home_page(models, data, raw_data):
         unsafe_allow_html=True
     )
 
-    # st.markdown("""<br>""", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
 
-    st.markdown("---")
+    # st.markdown("---")
 
 
 
@@ -2125,9 +2175,9 @@ def home_page(models, data, raw_data):
         <p class="card-desc">
             This app uses 
             <span style="color:#00BCD4;">data science</span> 
-            and 
+            & 
             <span style="color:#00BCD4;">machine learning</span> 
-            methodologies to improve the performance of a bank financial product <span style="color:#00BCD4;">(term deposit)</span>, especially in the areas of:
+            methodologies to improve the performance of a financial product <span style="color:#00BCD4;">(term deposit)</span>, especially in the areas of:
         </p>
         """,
         unsafe_allow_html=True
@@ -2143,7 +2193,7 @@ def home_page(models, data, raw_data):
         unsafe_allow_html=True
     )
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    # st.markdown("<br>", unsafe_allow_html=True)
     st.markdown('<p class="card-desc">Come try the functionalities below!</p>', unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
     # for local deployment
@@ -2154,19 +2204,19 @@ def home_page(models, data, raw_data):
     cards = [
         (
             "Deposit Prediction",
-            "Use fine-tuned AI/ML models to predict whether a client will deposit or not!",
+            "Predict client subscriptions with our fine-tuned AI/ML models!",
             "Deposit Prediction",
             f"{cloud_deployment}App_Visualizations/Homepage_Icons/predictive-icon.jpg"
         ),
         (
             "Interactive Dashboard",
-            "Find out underlying trends & insights via exploratory data analysis (EDA)!",
+            "Discover hidden trends & insights via exploratory data analysis (EDA)!",
             "Interactive Dashboard",
-            f"{cloud_deployment}App_Visualizations/Homepage_Icons/dashboard-icon.jpg"
+            f"{cloud_deployment}App_Visualizations/Homepage_Icons/dashboard-icon2.jpg"
         ),
         (
             "Customer Segmentation",
-            "Assign customers into groups with our clustering algorithm!",
+            "Assign customers into groups using our clustering algorithm!",
             "Customer Segmentation",
             f"{cloud_deployment}App_Visualizations/Homepage_Icons/cluster-analysis-icon.jpg"
         ),
@@ -2191,6 +2241,12 @@ def home_page(models, data, raw_data):
         }
         /* optional: lighter on hover */
         .card-container:hover .card-title{ color:#60A5FA; } 
+        /* Make all Streamlit buttons full-width */
+        div.stButton > button {
+            width: 100% !important;    /* stretch to fill the container */
+            display: block;
+            text-align: center;        /* keep text centered */
+        }
         </style>
         """, unsafe_allow_html=True)
 
@@ -2211,11 +2267,13 @@ def home_page(models, data, raw_data):
             </div>
             """
             st.markdown(card_html, unsafe_allow_html=True)
-            st.markdown("<br>", unsafe_allow_html=True)
+            
+            # st.markdown("<br>", unsafe_allow_html=True)
 
             if col.button("Try it out!", key=f"btn_{page_key}"):
                 st.session_state.page = page_key
                 st.rerun()
+
 
     st.markdown("<br><br>", unsafe_allow_html=True)
 
@@ -2228,18 +2286,18 @@ def prediction_page(models, data):
         .block-container { padding-top: 0rem; } /* tweak 0–1rem to taste */
 
         /* give page titles a predictable gap from whatever is above them */
-        h1.page-title { margin-top: 0rem; margin-bottom: 1.25rem; }
+        h1.page-title { margin-top: -4rem; margin-bottom: -3rem; }
         </style>
         """,
         unsafe_allow_html=True
     ) 
 
     st.markdown(
-        "<h1 class='page-title' style='color:#FFC107;'>Predicting Term Deposit Subscription"
-        "<span style='color:white;'> - With our Tuned AI/ML Model</span></h1>",
+        "<h1 class='page-title' style='color:#FFC107; font-size:7.5rem;'>Deposit Prediction </h1>",
+        # "<span style='color:white;'> - With our Tuned AI/ML Model</span></h1>",
         unsafe_allow_html=True
     )
-    st.markdown("<hr>",unsafe_allow_html=True) 
+    # st.markdown("<hr>",unsafe_allow_html=True) 
 
     model_names = list(models.keys())
 
@@ -2293,12 +2351,20 @@ def prediction_page(models, data):
         st.session_state[run_key]  = False
         st.session_state[pred_key] = None
 
+    # st.markdown("""
+    # <style>
+    # div.stButton > button {
+    #     width: 100% !important;   /* make button fill its container */
+    # }
+    # </style>
+    # """, unsafe_allow_html=True)
+
     # buttons
     c1, c2 = st.columns([1, 1])
     with c1:
-        do_predict = st.button(f"Predict with {name}  🔍", key=f"predict_{name}")
+        do_predict = st.button(f"Predict with {name}  🔍", key=f"predict_{name}", use_container_width=True)
     with c2:
-        do_cancel  = st.button("Try Another Prediction 🔄", key=f"cancel_{name}")
+        do_cancel  = st.button("Try Another Prediction 🔄", key=f"cancel_{name}", use_container_width=True)
 
     if do_cancel:
         st.session_state[run_key]  = False
@@ -2366,6 +2432,7 @@ def dashboard_page(data):
         padding: 0.25rem 0.5rem;
         border-radius: 6px;
         margin-bottom: 1rem;
+        margin-top: 0rem;
         }
 
         /* 2) Style each of your 2×2 boxes */
@@ -2407,14 +2474,35 @@ def dashboard_page(data):
         .page-title-row {
             display: flex;
             align-items: flex-end;   /* aligns the selectbox baseline with title bottom */
-            margin-top: 0rem;
+            margin-top: -10rem;
             margin-bottom: 0rem;
         }
 
         h1.page-title {
             margin: 0;   /* reset margins so row spacing takes effect */
             color: #9966FF;
-            margin-top:0rem
+            margin-top:-6.5rem
+        }
+        div[data-baseweb="select"] {
+            margin-top: -2.5rem;   /* tweak until it aligns */
+        }
+        div[data-baseweb="select"] > div {
+            font-size: 1.0rem !important;   /* increase the selected option text */
+        }
+
+        /* Target the dropdown menu items */
+        ul[role="listbox"] li {
+            font-size: 1.0rem !important;   /* increase the options in the dropdown */
+        }
+        .persona-label {
+            margin: 0; 
+            padding: 0rem;
+            font-size: 0.9rem;        /* tweak size */
+            font-weight: 600;
+            color: white;             /* or #FFC107 if you want accent */
+            line-height: 1;           /* tight line spacing */
+            margin-bottom: -4.25rem;  /* 👈 lift it closer to the selectbox */
+            transform: translateY(-3rem);
         }
         </style>
         """,
@@ -2430,14 +2518,19 @@ def dashboard_page(data):
 
         with col1:
             st.markdown(
-                "<h1 class='page-title' style='color:#FFC107;'>Interactive Dashboard"
-                "<span style='color:white;'> - Explore Key Metrics & Visualizations</span></h1>",
+                "<h1 class='page-title' style='color:#FFC107; font-size:7.5rem;'>Interactive Dashboard</h1>",
+                # "<span style='color:white;'> - Explore Key Metrics & Visualizations</span></h1>",
                 unsafe_allow_html=True
             )
         with col2:
+            st.markdown(
+                "<p class='persona-label'>User Persona:</p>",
+                unsafe_allow_html=True
+            )
             persona = st.selectbox(
                 "User Persona:",  # empty label so it doesn't show above
-                ["Salesperson", "Marketing Manager"]
+                ["Sales Representative", "Marketing Manager"],
+                label_visibility="collapsed"   # 👈 hides the label
             )
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -2626,14 +2719,14 @@ def dashboard_page(data):
 
             recommendations_html = """
             <div class="rec-card">
-            <h3>Marketing-based Recommendations</h3>
+            <h3>Data-Driven Recommendations</h3>
             <ul>
                 <li>Target campaigns in <u>March, August, November, and December</u>. </li>
-                <li>Focus on <u>customers in their 30's</u>, they are the most responsive group.</li>
-                <li>Boost conversion by <u>increasing call duration</u>, this is more impactful than age.</li>
-                <li>Customers without loans are more likely to convert in shorter calls.</li>
+                <li><u>Focus on customers in their 30's</u>, they are the most responsive group.</li>
+                <li>Boost conversion by <u>increasing call duration</u>, this is the most impactful method.</li>
+                <li><u>Customers without loans</u> are more likely to <u>convert in shorter calls</u>.</li>
                 <li>Since <u>most use cellular phones</u>, get their attention quickly and increase engagement time.</li>
-                <li><u>Re-engage past subscribers</u>. Over 50% convert again when contacted.</li>
+                <li><u>Re-engage past subscribers</u>. Over 50% converted again when contacted.</li>
             </ul>
             </div>
             """
@@ -2644,11 +2737,11 @@ def dashboard_page(data):
             st.markdown('<br>', unsafe_allow_html=True)
             # st.markdown('<div class="box-card">', unsafe_allow_html=True)
             st.markdown(
-                "<h3 style='color:#00BCD4;'>Marketing Campaign Trend Over Time</h3>",
+                "<h3 style='color:#00BCD4;'>Marketing Campaign Trend</h3>",
                 unsafe_allow_html=True
             )
             # st.subheader("Marketing Campaign Trend Over Time")
-            ts_tab, ms_tab = st.tabs(["Monthly Count","Monthly Success"])
+            ts_tab, ms_tab = st.tabs(["Monthly Contacts","Monthly Win Rate"])
             with ts_tab:
                 # daily number of success over time plot
                 # st.markdown('<div class="box-card">', unsafe_allow_html=True)
@@ -2664,14 +2757,14 @@ def dashboard_page(data):
         # bottom-left box: works both Sales and Marketing
         with row2_col1:
             st.markdown(
-                "<h3 style='color:#00BCD4;'>Wins Distribution</h3>",
+                "<h3 style='color:#00BCD4;'>Proportion of Wins</h3>",
                 unsafe_allow_html=True
             )
             # st.subheader("Wins by Channel & Loans")
-            contact_tab, loan_tab = st.tabs(["Contact Channel","Loan Overlap"])
+            contact_tab, loan_tab = st.tabs(["Contact Channel","Loan Ownership"])
             with contact_tab:
                 # Plot 3: contact type pie (Plotly)
-                contact_fig= contact_channel_pie(data, 265, 265)    
+                contact_fig= contact_channel_pie(data, 325, 325)    
                 st.plotly_chart(contact_fig, use_container_width=True)
             with loan_tab:
                 # Plot 4: loan Venn (matplotlib)
@@ -2683,7 +2776,7 @@ def dashboard_page(data):
         # Bottom-right box: distributions & heatmaps (Plots 5, 6 & 7)
         with row2_col2:
             st.markdown(
-                "<h3 style='color:#00BCD4;'>Distributions & Heatmaps Over Wins</h3>",
+                "<h3 style='color:#00BCD4;'>Distribution & Heatmaps Over Wins</h3>",
                 unsafe_allow_html=True
             )
             # st.subheader("Distributions & Heatmaps Over Wins")
@@ -2704,7 +2797,7 @@ def dashboard_page(data):
                 st.altair_chart(plot_loans_duration_heatmap(data), use_container_width=True)
 
     # if persona is salesperson
-    elif persona =="Salesperson":
+    elif persona =="Sales Representative":
 
         # --- Create our 2×2 grid ---
         row1_col1, row2_col2, row2_col1 = st.columns([1.15,1,1], gap="medium")
@@ -2722,14 +2815,14 @@ def dashboard_page(data):
 
             recommendations_html = """
                 <div class="rec-card">
-                <h3>Sales-Based Recommendations</h3>
+                <h3>Data-Driven Recommendations</h3>
                 <ul>
                     <li><u>Prior subscribers are likely to convert again</u>, prioritize follow-ups with them.</li>
-                    <li>Focus outreach during <u>summer / near Christmas</u> when conversion rates are highest.</li>
-                    <li>Don’t overlook clients with existing loans —> <u>40% still convert</u>.</li>
-                    <li><u>Duration is crucial for success</u> —> aim for longer, value-driven conversations (<u>at least 9 minutes</u>).</li>
+                    <li>Focus outreach during <u>summer / Christmas</u> when conversion rates are the highest.</li>
+                    <li>Don’t overlook clients with existing loans —> <u>40% of them still convert</u>.</li>
+                    <li><u>Duration is crucial for success</u> —> try to aim for longer conversations (<u> > 9 minutes</u>).</li>
                     <li><u>Most clients use mobile phones</u> — grab their attention quickly & make every second count.</li>
-                    <li>Most days have <u>fewer than 50 callse</u>. Increase outreach volume to improve campaign coverage.</li>
+                    <li>Most days have made <u>fewer than 50 calls</u>. Increase outreach volume to improve campaign success.</li>
                 </ul>
                 </div>
                 """
@@ -2740,14 +2833,14 @@ def dashboard_page(data):
         with row2_col1:
             st.markdown('<br>', unsafe_allow_html=True)
             st.markdown(
-                "<h3 style='color:#00BCD4;'>Outcome by Channel & Loans</h3>",
+                "<h3 style='color:#00BCD4;'>Proportion of Wins</h3>",
                 unsafe_allow_html=True
             )
             # st.subheader("Campaign Outcome by Channel & Loans")
-            contact_tab, loan_tab = st.tabs(["Contact Channel","Loan Overlap"])
+            contact_tab, loan_tab = st.tabs(["Contact Channel","Loan Ownership"])
             with contact_tab:
                 # Plot 3: contact type pie (Plotly)
-                contact_fig= contact_channel_pie(data, 300, 300)    
+                contact_fig= contact_channel_pie(data, 325, 325)    
                 st.plotly_chart(contact_fig, use_container_width=True)
             with loan_tab:
                 # Plot 4: loan Venn (matplotlib)
@@ -2762,7 +2855,7 @@ def dashboard_page(data):
         # with st.columns(1):
             st.markdown('<br>', unsafe_allow_html=True)
             st.markdown(
-                "<h3 style='color:#00BCD4;'>Outcome Based on Past Outcomes</h3>",
+                "<h3 style='color:#00BCD4;'>Campaign Outcome Based on Past</h3>",
                 unsafe_allow_html=True
             )
             # st.subheader("Campaign Outcome Based on Past Campaign's Outcomes")
@@ -2770,8 +2863,8 @@ def dashboard_page(data):
                 "No Past","Successful Past", "Inconclusive Past"
             ])
 
-            width=300
-            height=300
+            width=325
+            height=325
 
             with no_past_tab:
                 # Plot 5: age donut for past failed scenarios
@@ -2790,11 +2883,11 @@ def dashboard_page(data):
         # st.markdown('<br>', unsafe_allow_html=True)
         # st.markdown('<div class="box-card">', unsafe_allow_html=True)
         st.markdown(
-            "<h3 style='color:#00BCD4;'>Marketing Campaign Trend Over Time</h3>",
+            "<h3 style='color:#00BCD4;'>Marketing Campaign Trend</h3>",
             unsafe_allow_html=True
         )
         # st.subheader("Marketing Campaign Trend Over Time")
-        ts_tab, ms_tab = st.tabs(["Daily Count","Monthly Success"])
+        ts_tab, ms_tab = st.tabs(["Daily Contacts","Monthly Win Rate"])
         with ts_tab:
             # daily number of success over time plot
             st.altair_chart(daily_line_altair(data), use_container_width=True)
@@ -2813,19 +2906,18 @@ def clustering_page(data):
         .block-container { padding-top: 0rem; } /* tweak 0–1rem to taste */
 
         /* give page titles a predictable gap from whatever is above them */
-        h1.page-title { margin-top: 0rem; margin-bottom: 1.25rem; }
+        h1.page-title { margin-top: -4rem; margin-bottom: 0rem; }
         </style>
         """,
         unsafe_allow_html=True
     )
 
     st.markdown(
-                "<h1 class='page-title' style='color:#FFC107;'>Customer Segmentation"
-                "<span style='color:white;'> - Group the Customers Using AI</span></h1>",
+                "<h1 class='page-title' style='color:#FFC107; font-size:7.5rem;'>Customer Segmentation</h1>",
+                # "<span style='color:white;'> - Group the Customers Using AI</span></h1>",
                 unsafe_allow_html=True
             )
-
-    st.markdown("<hr>",unsafe_allow_html=True)
+    # st.markdown("<hr>",unsafe_allow_html=True)
 
     # ─── 0) Setup expander state & callback ────────────────────────────
     # if "cluster_expanded" not in st.session_state: 
@@ -2844,33 +2936,55 @@ def clustering_page(data):
         "Loans": ["housing", "loan", "default"],
         "Campaign Metrics": ["day", "month", "duration", "campaign", "pdays", "previous", "poutcome", "days_in_year"]
     }
+
+    # --- new wording (DESCS/EXS), plus emojis ---
     DESCS = {
-        k: v for k, v in {
-            "Personal Information": "Core numeric features (age, education, balance, contact)",
-            "Loans": "Housing/personal loans",
-            "Campaign Metrics": "Campaign contact timing & outcomes"
-        }.items()
+        "Personal Information": "Demographics & account context: age, education level, balance, contact method.",
+        "Loans": "Existing credit obligations: housing/mortgage, personal loan, default history.",
+        "Campaign Metrics": "Campaign data: contact time/duration, # of contacts, prior contacts & outcome, etc.",
     }
     EXS = {
-        k: v for k, v in {
-            "Personal Information": "e.g. age=42, balance=10000.0",
-            "Loans": "e.g. housing=1, loan=0",
-            "Campaign Metrics": "e.g. duration=900, previous=2"
-        }.items()
+        "Personal Information": "e.g., age=42, balance=10000.0",
+        "Loans": "e.g., housing=1, loan=0",
+        "Campaign Metrics": "e.g., duration=900, previous=2",
+    }
+    EMOJI = {
+        "Personal Information": "👤",
+        "Loans": "🏦",
+        "Campaign Metrics": "📣",
     }
 
-    
+    # --- unchanged multiselect behavior ---
     chosen = st.multiselect("Feature Selection - Please select your feature groups:", list(FEATURE_GROUPS.keys()))
     if not chosen:
         st.warning("Select at least one group to proceed.")
-        return
+        return  # ⬅️ keep the original early-return behavior
 
-    # show table of selections
-    sel_rows = [{"Feature Group": g, "Description": DESCS[g], "Examples": EXS[g]} for g in chosen]
-    # st.table(pd.DataFrame(sel_rows))
+    # --- same columns as old code, but append emoji to Feature Group ---
+    sel_rows = [
+        {"Feature Group": f"{g} {EMOJI.get(g, '')}".strip(), "Description": DESCS[g], "Examples": EXS[g]}
+        for g in chosen
+    ]
     df = pd.DataFrame(sel_rows)
-    df.index = df.index + 1
-    st.table(df)
+
+    # --- show as dataframe (with graceful fallback) ---
+    try:
+        st.dataframe(
+            df,
+            hide_index=True,
+            use_container_width=True,
+            column_config={
+                "Feature Group": st.column_config.TextColumn(width="medium"),
+                "Description":   st.column_config.TextColumn(width="large"),
+                "Examples":      st.column_config.TextColumn(width="medium"),
+            },
+        )
+    except Exception:
+        # Older Streamlit: fall back to table and hide index if possible
+        try:
+            st.table(df.style.hide(axis="index"))
+        except Exception:
+            st.table(df)
 
 
     cols = []
@@ -2879,13 +2993,14 @@ def clustering_page(data):
     cols = list(dict.fromkeys(cols))
     # st.write(f"{len(cols)} features selected.")
 
+    
     st.markdown(
         f"""<p>{'<span style="color:#FFC107;"><u>'+str(len(cols))+'</u></span>'} features are selected.</p>""",
         unsafe_allow_html=True
     )
-    if len(cols) < 2:
-        st.error("Pick at least two features.")
-        return
+    # if len(cols) < 2:
+    #     st.error("Pick at least two features.")
+    #     return
 
     # invalidate on change
     if st.session_state.get("last_cols") != cols:
@@ -2898,8 +3013,10 @@ def clustering_page(data):
     # Note: we attach on_click so that after clicking, cluster_expanded=True
     run = st.button(
         "Run HDBSCAN Clustering Algorithm to Categorize Clients",
-        on_click=_expand_cluster
+        on_click=_expand_cluster,
+        use_container_width=True
     )
+
     if run:
         with st.spinner("Clustering Customers…"):
             scaler, Xs = get_scaled(data, cols)
@@ -2946,9 +3063,14 @@ def clustering_page(data):
         #     msg = f"There are {num_clusters} customer groups."
         # st.header(msg)
 
-        st.markdown("<br></br>", unsafe_allow_html=True)
+        st.markdown("<hr>", unsafe_allow_html=True)
+        # st.markdown("<br></br>", unsafe_allow_html=True)
 
-        with st.expander("Click Here to See More Visualizations Below!", expanded=True):
+        st.markdown(
+            "<h3 class='page-title' style='color:#FFC107;'>See More Visualizations Below!</h3>",
+            unsafe_allow_html=True
+        )
+        with st.expander(" ", expanded=True):
 
 
             clustered = data.assign(Cluster=st.session_state["labels"])
@@ -2960,54 +3082,67 @@ def clustering_page(data):
             # show_example_table(clustered, selected_cols)
             
             # 2) violin plots
-            st.markdown("---")
+            # st.markdown("---")
             top_features = plot_violin_top_features_raw(clustered, selected_cols, top_n=3)
+
+            testcol1, testcol2 = st.columns(2, gap="medium")
+
+            with testcol1:
+                # 3) 3D scatter
+                plot_3d_clusters_raw(clustered, selected_cols, top_features)
+
+            with testcol2:
+                # note: if you trained one RF per cluster in rf_dict, pick rf_dict[cl] in the plotting fn
+                plot_tree_feature_importance(
+                    clustered,
+                    st.session_state["scaler"].transform(clustered[selected_cols]),
+                    selected_cols
+                )
             
-            # 3) 3D scatter
-            plot_3d_clusters_raw(clustered, selected_cols, top_features)
+            
             
             # 4) cluster means table
             st.markdown("---")
             show_cluster_feature_means_raw(clustered, selected_cols)
             
             # 5) tree-based importance
-            st.markdown("---")
-            # note: if you trained one RF per cluster in rf_dict, pick rf_dict[cl] in the plotting fn
-            plot_tree_feature_importance(
-                clustered,
-                st.session_state["scaler"].transform(clustered[selected_cols]),
-                selected_cols
-            )
+            # st.markdown("---")
+            # # note: if you trained one RF per cluster in rf_dict, pick rf_dict[cl] in the plotting fn
+            # plot_tree_feature_importance(
+            #     clustered,
+            #     st.session_state["scaler"].transform(clustered[selected_cols]),
+            #     selected_cols
+            # )
             
             # 6) LIME explainer in an expander
-            st.markdown("---")
+            # st.markdown("---")
             # st.subheader("Try enter a new customer to see which group does he/she belong!")
-            st.markdown(
-                "<h2 class='page-title' style='color:#FFC107;'>Try Enter a New Customer to See Which Group Does he/she Belong!</h2>",
-                unsafe_allow_html=True
-            )
-            with st.expander(" ", expanded=True):
-                # st.markdown("---")
-                show_example_table(clustered, selected_cols)
+        st.markdown(
+            "<h3 class='page-title' style='color:#FFC107;'>Try Enter a New Customer to See Which Group he/she Belongs!</h3>",
+            unsafe_allow_html=True
+        )
+        with st.expander(" ", expanded=True):
+            # st.markdown("---")
+            show_example_table(clustered, selected_cols)
 
-                show_lime_explanation_custom(
-                    st.session_state["rf_multi"],
-                    st.session_state["scaler"],
-                    clustered,
-                    cols,
-                    top_n=5
-                )
-                    
-                # Shoe LIME Function for XAI
-                # show_lime_explanation_custom(
-                #     # if you kept my rf_dict, you’ll need to pluck the right cluster’s RF:
-                #     # st.session_state["rf_dict"][1],
-                #     st.session_state["rf_multi"],
-                #     st.session_state["scaler"],
-                #     clustered,
-                #     selected_cols,
-                #     top_n=5
-                # )
+            show_lime_explanation_custom(
+                st.session_state["rf_multi"],
+                st.session_state["scaler"],
+                clustered,
+                cols,
+                top_n=5
+            )
+                
+            # Shoe LIME Function for XAI
+            # show_lime_explanation_custom(
+            #     # if you kept my rf_dict, you’ll need to pluck the right cluster’s RF:
+            #     # st.session_state["rf_dict"][1],
+            #     st.session_state["rf_multi"],
+            #     st.session_state["scaler"],
+            #     clustered,
+            #     selected_cols,
+            #     top_n=5
+            # )
 
 
 # Showing the data overview & export page
@@ -3020,20 +3155,21 @@ def overview_page(data, preprocessed):
         .block-container { padding-top: 0rem; } /* tweak 0–1rem to taste */
 
         /* give page titles a predictable gap from whatever is above them */
-        h1.page-title { margin-top: 0rem; margin-bottom: 1.25rem; }
+        h1.page-title { margin-top: -5rem; margin-bottom: 0rem; }
         </style>
         """,
         unsafe_allow_html=True
     ) 
-    st.markdown("<h1 class='page-title' style='color:#FFC107;'>Data Overview & Export</h1>",unsafe_allow_html=True) 
+    st.markdown("<h1 class='page-title' style='color:#FFC107; font-size:7.5rem;'>Data Overview & Export</h1>",unsafe_allow_html=True) 
 
     # st.header("Data Overview & Export")
-    st.markdown("---")
+    # st.markdown("---")
     # st.write("This page lets you download the dataset used for this app, either the original “raWWWw” dataset or the cleaned & feature-engineered version.")
         
     # st.write("This dataset captures information from direct marketing campaigns from a Portuguese banking institution. Its goal is to predict whether its clients will subscribe a term deposit or not.")
     
     # st.markdown("---")
+    st.markdown("<br>", unsafe_allow_html=True)
 
     # ————— Way 2: Brief narrative description —————
     st.markdown(
@@ -3055,7 +3191,7 @@ def overview_page(data, preprocessed):
         unsafe_allow_html=True
     )
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<hr>", unsafe_allow_html=True)
     
     st.write("This page lets you download the dataset used for this app, including the original “raw” dataset or the “processed” data by utilizng the following techniques:") 
     st.markdown(
@@ -3113,10 +3249,17 @@ def overview_page(data, preprocessed):
             unsafe_allow_html=True
         )
         csv_bytes = get_csv_bytes(data)
-        st.download_button("Download CSV 📥", csv_bytes, "raw_data.csv", "text/csv")
+        # st.download_button("Download CSV 📥", csv_bytes, "raw_data.csv", "text/csv")
         xlsx_buf   = get_excel_buffer(data)
-        st.download_button("Download XLSX 📥", xlsx_buf, "raw_data.xlsx",
-                           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        # st.download_button("Download XLSX 📥", xlsx_buf, "raw_data.xlsx",
+        #                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+        c1, c2 = st.columns(2)
+        with c1:
+            st.download_button("Download CSV 📥", csv_bytes, "raw_data.csv", "text/csv", use_container_width=True)
+        with c2:
+            st.download_button("Download XLSX 📥", xlsx_buf, "raw_data.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True)
 
     # ─── Divider ───────────────────────────────────────────────
     with col_div:
@@ -3125,7 +3268,7 @@ def overview_page(data, preprocessed):
         <div style="
             border-left:2px solid #ccc;
             height:100%;
-            min-height:250px;   /* adjust to match your content */
+            min-height:200px;   /* adjust to match your content */
             margin:0 auto;
         "></div> 
         """,
@@ -3144,9 +3287,15 @@ def overview_page(data, preprocessed):
         # st.markdown(f"- Rows **(Number of Entries):** <u>{preprocessed.shape[0]:,}</u>  \n- Columns **(Number of Features):** <u>{preprocessed.shape[1]:,} **(+15)**</u>", unsafe_allow_html=True)
         csv2 = get_csv_bytes(preprocessed)
         xlsx2 = get_excel_buffer(preprocessed)
-        st.download_button("Download CSV 📥", csv2, "Preprocessed_Data.csv", "text/csv")
-        st.download_button("Download XLSX 📥", xlsx2, "Preprocessed_Data.xlsx",
-                           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        # st.download_button("Download CSV 📥", csv2, "Preprocessed_Data.csv", "text/csv")
+        # st.download_button("Download XLSX 📥", xlsx2, "Preprocessed_Data.xlsx",
+        #                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        c1, c2 = st.columns(2)
+        with c1:
+            st.download_button("Download CSV 📥", csv2, "Preprocessed_Data.csv", "text/csv", use_container_width=True)
+        with c2:
+            st.download_button("Download XLSX 📥", xlsx2, "Preprocessed_Data.xlsx",
+                           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True)
     
 # Displays the final acknowledgement page
 def acknowledgement_page(data):
@@ -3288,7 +3437,7 @@ def main():
         today = datetime.date.today().strftime("%Y-%m-%d")
         # st.caption(f"v1.1.0 • Last Updated On: {today}")
         st.markdown(
-            f"<h5 style='text-align:center;margin:0.25rem 0;'>"
+            f"<h5 style='text-align:center;margin:-1rem 0;'>"
             f"v1.1.0 • Last Updated On: {today}"
             f"</h5>",
             unsafe_allow_html=True,
