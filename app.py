@@ -3278,7 +3278,7 @@ def overview_page(data, preprocessed):
     # Preprocessed data box
     # ─── Preprocessed Data ─────────────────────────────────────
     with col2:
-        st.subheader("Processed Data")
+        st.subheader("Processed / Cleaned Data")
         st.markdown(
             f"- Rows **(Number of Entries):** <span style='color:#00BCD4;'><u>{preprocessed.shape[0]:,}</u></span>  \n"
             f"- Columns **(Number of Features):** <span style='color:#00BCD4;'><u>{preprocessed.shape[1]:,}</u></span> (+15)",
