@@ -747,15 +747,8 @@ def auto_hdbscan(X, min_size=10):
     return hdbscan.HDBSCAN(min_cluster_size=min_size).fit_predict(X)
 
 # Function to show feature example and descriptions table
-def show_example_table(data, selected_cols):
+def show_example_table(data, selected_cols, special=0):
 
-    # st.subheader("Feature Descriptions & Examples:")
-    # st.markdown(
-    #     f"""<h2>{'<span style="color:#9966FF;">Feature Descriptions & Examples:</span>'}</h2>""",
-    #     unsafe_allow_html=True
-    # )
-
-    # 1) define your master mappings once:
     DESC = {
         "age":               "Age (whole number)",
         "education":         "Education level (1=elementatry, 2=secondary, 3=post-secondary)",
@@ -767,11 +760,11 @@ def show_example_table(data, selected_cols):
         "loan":              "Personal loan? (1=yes, 0=no)",
         "day":               "Day of month in the most recent marketing campaign (whole number: 1–31)",
         "month":             "Month of year in the most recent marketing campaign (whole number: 1–12)",
-        "duration":          "Call duration in seconds (whole number)",
+        "duration":          "Call duration in seconds (whole number)",   # default
         "campaign":          "Times contacted during this marketing campaign, including this time (whole number)",
         "pdays":             "Days since last marketing campaign (whole number, -1=first time)",
         "previous":          "Times contacted before this marketing campaign (whole number)",
-        "poutcome":          "Outcome of previous marketing campaign (failure/nonexistent/success)",
+        "poutcome":          "Outcome of previous marketing campaign (0=failure / 0.5=nonexistent / 1=success)",
         "marital_divorced":  "Divorced? (1=yes, 0=no)",
         "marital_married":   "Married? (1=yes, 0=no)",
         "marital_single":    "Single? (1=yes, 0=no)",
@@ -788,7 +781,7 @@ def show_example_table(data, selected_cols):
         "job_unemployed":    "Not working now? (1=yes, 0=no)",
         "job_unknown":       "Unknown job? (1=yes, 0=no)",
         "days_in_year":      "Current day of year (whole number: 1–366)",
-        "y":                 "Did the client subscribed the product (term deposit)? (1=yes, 0=no) (TARGET VARIABLE)",   # target, fill in later
+        "y":                 "Did the client subscribed the product (term deposit)? (1=yes, 0=no) (TARGET VARIABLE)",
     }
 
     EX = {
@@ -802,7 +795,7 @@ def show_example_table(data, selected_cols):
         "loan":              "1",
         "day":               "15",
         "month":             "7",
-        "duration":          "900",
+        "duration":          "900",   # default in seconds
         "campaign":          "3",
         "pdays":             "5",
         "previous":          "2",
@@ -826,40 +819,39 @@ def show_example_table(data, selected_cols):
         "y":                 "1",
     }
 
+    # 👉 Override duration based on `special`
+    if special != 0:
+        DESC["duration"] = "Call duration in minutes (whole number)"
+        EX["duration"]   = "15"  # example in minutes
 
-    # 1) Re-order selected_cols so ‘y’ is last (if present)
+    # --- Build the DataFrame as you already do ---
     ordered_feats = [f for f in selected_cols if f != "y"]
     if "y" in selected_cols:
         ordered_feats.append("y")
 
-    # 2) Build a DataFrame with exactly |ordered_feats| columns
     feature_info = pd.DataFrame(
         index=["Description", "Example"],
         columns=ordered_feats,
-        data=""   # placeholder
+        data=""
     )
 
-    # 3) Fill each row by looking up in the dicts
     feature_info.loc["Description"] = [DESC.get(f, "") for f in ordered_feats]
     feature_info.loc["Example"]     = [EX.get(f,   "") for f in ordered_feats]
 
-    # 4) Transpose & reformat
     fi = feature_info.T.reset_index().rename(columns={"index": "Feature"})
     fi.index = range(1, len(fi) + 1)
 
-    # 5) Display
-    # st.table(fi)
-
     st.dataframe(
         fi,
-        hide_index=True,              # remove row numbers
-        use_container_width=True,     # fill the column space
+        use_container_width=True,
         column_config={
             "Feature":      st.column_config.TextColumn(width="medium"),
             "Description":  st.column_config.TextColumn(width="large"),
             "Example":      st.column_config.TextColumn(width="small"),
         },
     )
+
+
 
 
 
@@ -1066,6 +1058,8 @@ def show_shap_explanation_custom(
     # 2) Get global means for defaults
     global_means = data[selected_cols].mean()
 
+    # print(top_feats)
+
     # 3) Build sliders
     st.write(f"Adjust values for top {top_n} features:")
     raw_vals = {}
@@ -1078,13 +1072,30 @@ def show_shap_explanation_custom(
             # continuous slider
             raw_vals[feat] = st.slider(
                 label=feat,
-                min_value=float(lo),
-                max_value=float(hi),
-                value=float(mean),
+                min_value=0,
+                # max_value=float(hi),
+                # value=float(mean),
+                value=10000.00,
                 step=0.01,
                 format="%.2f",
                 key=f"slider_{feat}"
             )
+        elif feat == "duration":
+            # UI in minutes, convert back to seconds for the model
+            min_m = int(np.floor(lo / 60.0))
+            max_m = int(np.ceil(hi / 60.0))
+            default_m = int(round(mean / 60.0))
+
+            minutes = st.slider(
+                label="duration (minutes)",
+                min_value=min_m,
+                max_value=max_m,
+                value=default_m,
+                step=1,
+                format="%d",
+                key=f"slider_{feat}_min"
+            )
+            raw_vals[feat] = minutes * 60  # store back in seconds
         else:
             # **integer** slider
             raw_vals[feat] = st.slider(
@@ -1187,17 +1198,43 @@ def show_lime_explanation_custom(
         for feat in top_feats:
             lo, hi = float(data[feat].min()), float(data[feat].max())
             default = float(global_means[feat])
-
-            # Give each slider a key that includes the form_id
-            slider_key = f"lime_{feat}_{form_id}"
+            input_key = f"lime_{feat}_{form_id}"
 
             if feat == "balance":
-                raw_vals[feat] = st.slider(
-                    feat, lo, hi, default, step=0.01, format="%.2f", key=slider_key
+                # Allow any value, not capped by min/max
+                raw_vals[feat] = st.number_input(
+                    feat,
+                    min_value=0.00,
+                    max_value=100000000.00,
+                    value=10000.00,
+                    step=0.01,
+                    format="%.2f",
+                    key=input_key
                 )
+
+            elif feat == "duration":
+                # Let user choose in minutes, store back in seconds
+                min_m = int(np.floor(lo / 60.0))
+                max_m = int(np.ceil(hi / 60.0))
+                default_m = int(round(default / 60.0))
+
+                minutes = st.slider(
+                    "duration (minutes)",
+                    min_value=min_m,
+                    max_value=60,
+                    value=default_m,
+                    step=1,
+                    format="%d",
+                    key=input_key
+                )
+                raw_vals[feat] = minutes * 60  # convert to seconds
+
             else:
+                # Integer slider for other features
                 raw_vals[feat] = st.slider(
-                    feat, int(lo), int(hi), int(default), step=1, format="%d", key=slider_key
+                    feat,
+                    int(lo), int(hi), int(default),
+                    step=1, format="%d", key=input_key
                 )
 
         st.markdown("<br>", unsafe_allow_html=True)
@@ -1214,20 +1251,43 @@ def show_lime_explanation_custom(
 
         # 4) Predict & pull out class names
         pred_label = int(rf_model.predict(scaled_pt)[0])
-        sk_classes = list(rf_model.classes_)
+        sk_classes = list(rf_model.classes_)  # keeps the order used by predict_proba
         pred_index = sk_classes.index(pred_label)
         label_map = {cid: ("Outliers" if cid == -1 else f"Customer Group {cid+1}") for cid in sk_classes}
 
-        output_col1, output_col2= st.columns ([7,3], gap="large")
+        # 5) Probabilities for each class
+        proba_row = rf_model.predict_proba(scaled_pt)[0]  # same order as sk_classes
+
+        # Build a tidy DataFrame
+        prob_df = (
+            pd.DataFrame({
+                "Group ID": sk_classes,
+                "Group": [label_map[cid] for cid in sk_classes],
+                "Probability": proba_row
+            })
+            .sort_values("Probability", ascending=False)
+            .reset_index(drop=True)
+        )
+        prob_df["Probability (%)"] = (prob_df["Probability"] * 100).round(2)
+        prob_df.index = prob_df.index + 1
+
+        output_col1, output_col2 = st.columns([7, 3], gap="large")
         with output_col1:
             msg = (
                 "Predicted Outcome: "
                 f"<span style='color:#FFC107;'>{label_map[pred_label]}</span>, "
                 "(Probability = "
-                f"<span style='color:#FFC107;'>{rf_model.predict_proba(scaled_pt)[0][pred_index]*100:.0f}%</span>)"
+                f"<span style='color:#FFC107;'>{proba_row[pred_index]*100:.0f}%</span>)"
             )
             st.markdown(f"<h2>{msg}</h2>", unsafe_allow_html=True)
-            # st.markdown("---")
+
+            # Show probability table under the headline
+            # st.markdown("#### Probability by group")
+            st.dataframe(
+                prob_df[["Group", "Probability (%)"]],
+                use_container_width=True
+            )
+
         with output_col2:
             st.markdown("""
             <style>
@@ -1679,7 +1739,7 @@ def user_input_form_decision_tree():
     #     "<h3 style='color:#FFC107;'>Fill in Your Customer's Values:</h3>",
     #     unsafe_allow_html=True
     # )
-    st.subheader("Fill in Your Customer's Values:")
+    st.subheader("Fill in Your Client's Values:")
 
 
     # Calculate the current day of the year for days_in_year
@@ -1802,7 +1862,7 @@ def user_input_form_random_forest():
     # st.dataframe(pros_cons_df, use_container_width=True)  # interactive alternative :contentReference[oaicite:13]{index=13}
     # st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown("---")
-    st.subheader("Fill in Your Customer's Values:")
+    st.subheader("Fill in Your Client's Values:")
     # st.markdown(
     #     "<h3 style='color:#FFC107;'>Fill in Your Customer's Values:</h3>",
     #     unsafe_allow_html=True
@@ -1937,7 +1997,7 @@ def user_input_form_xgboost():
     # st.dataframe(pros_cons_df, use_container_width=True)  # interactive alternative :contentReference[oaicite:13]{index=13}
     # st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown("---")
-    st.subheader("Fill in Your Customer's Values:")
+    st.subheader("Fill in Your Client's Values:")
     # st.markdown(
     #     "<h3 style='color:#FFC107;'>Fill in Your Customer's Values:</h3>",
     #     unsafe_allow_html=True
@@ -2069,8 +2129,8 @@ def display_prediction(prediction):
         with col2:
             # st.write("### The Marketing Campaign will Succeed!")
             st.markdown(
-                f"""<h3>The Marketing Campaign will 
-                <span style="color:#22C55E"><u>Succeed!</u></span></h3>""",
+                f"""<h3>Your Client Will 
+                <span style="color:#22C55E"><u>Subscribe</u></span> to the Term Deposit Product.</h3>""",
                 unsafe_allow_html=True
             )
     # Predict failure case:
@@ -2080,8 +2140,8 @@ def display_prediction(prediction):
         with col2:
             # st.write("### The Marketing Campaign will Fail.")
             st.markdown(
-                f"""<h3>The Marketing Campaign will 
-                <span style="color:#EF4444"><u>Fail!</u></span></h3>""",
+                f"""<h3>Your Client Will 
+                <span style="color:#EF4444"><u>Not Subscribe</u></span> to the Term Deposit Product.</h3>""",
                 unsafe_allow_html=True
             )
 
@@ -2944,7 +3004,7 @@ def clustering_page(data):
         "Campaign Metrics": "Campaign data: contact time/duration, # of contacts, prior contacts & outcome, etc.",
     }
     EXS = {
-        "Personal Information": "e.g., age=42, balance=10000.0",
+        "Personal Information": "e.g., age=42, balance=10000.00",
         "Loans": "e.g., housing=1, loan=0",
         "Campaign Metrics": "e.g., duration=900, previous=2",
     }
@@ -2955,7 +3015,7 @@ def clustering_page(data):
     }
 
     # --- unchanged multiselect behavior ---
-    chosen = st.multiselect("Feature Selection - Please select your feature groups:", list(FEATURE_GROUPS.keys()))
+    chosen = st.multiselect("Feature Selection - Please Select Your Feature Groups:", list(FEATURE_GROUPS.keys()))
     if not chosen:
         st.warning("Select at least one group to proceed.")
         return  # ⬅️ keep the original early-return behavior
@@ -3067,7 +3127,7 @@ def clustering_page(data):
         # st.markdown("<br></br>", unsafe_allow_html=True)
 
         st.markdown(
-            "<h3 class='page-title' style='color:#FFC107;'>See More Visualizations Below!</h3>",
+            "<h3 class='page-title' style='color:#FFC107;'>Visualizations:</h3>",
             unsafe_allow_html=True
         )
         with st.expander(" ", expanded=True):
@@ -3123,7 +3183,7 @@ def clustering_page(data):
         )
         with st.expander(" ", expanded=True):
             # st.markdown("---")
-            show_example_table(clustered, selected_cols)
+            show_example_table(clustered, selected_cols, special=1)
 
             show_lime_explanation_custom(
                 st.session_state["rf_multi"],
@@ -3488,7 +3548,8 @@ def main():
         with st.expander("❓ Help & Docs"):
             st.write("- [User Guide](https://github.com/Alex-Mak-MCW/FinML-Studio/blob/main/README.md)")
             st.write("- [Source Code](https://github.com/Alex-Mak-MCW/FinML-Studio/tree/main)")
-            st.write("- [Contact Me!](https://www.linkedin.com/in/alex-mak-824187247/)")
+            # st.write("- [Contact Me!](https://www.linkedin.com/in/alex-mak-/824187247)")
+            st.write("- [Contact Me!](https://www.linkedin.com/in/alex-mak-mcw)")
         
         current_year=datetime.date.today().year
 
