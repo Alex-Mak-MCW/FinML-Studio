@@ -28,7 +28,7 @@ An end-to-end app leveraging data science & AI/ML for **product analytics** and 
 
 <br>
 
-👉 [Live Demo - TBA](#)  
+👉 [App Live Demo](https://youtu.be/MxFCaVtEvsA)  
 ---
 
 <!--
