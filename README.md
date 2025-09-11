@@ -25,11 +25,11 @@ tags:
 # 📑 Table of Contents
 - [App Walkthrough Video](#app-walkthrough-video)
 - [Features](#features)
-- [Who is this for?](#who-is-this-for?)
+- [Who is this for?](#who-is-this-for)
 - [Using the App](#using-the-app)
 - [Technical Stack](#technical-stack)
 - [Contact](#contact)
-- 
+
 <br>
 
 # App Walkthrough Video
