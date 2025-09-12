@@ -69,7 +69,7 @@ tags:
 
 - **Product Managers** → Track and evaluate product performance under a data-driven lens to support smarter decision-making.  
 - **Analysts** → Dive deep into product data, generate reports, and uncover trends using explainable ML models.  
-- **Business Leaders** → Quickly and conveniently gain high-level, actionable insights
+- **Business Leaders** → Quickly and conveniently gain high-level, actionable insights.
 - **Students & Learners** → Explore an end-to-end app that demonstrates the complete ML model development lifecycle.  
 
 
@@ -99,7 +99,7 @@ streamlit run app.py
 | | |
 |---|---|
 | **Data Processing**   | - **Pandas, Scipy, Numpy** for data cleaning & feature engineering <br> - **Imblearn** for handling class imbalance via data oversampling (SMOTE)|
-| **Data Analysis & Visualization** | - **Matplotlib** &amp; **Seaborn** for standard charts <br> - **Plotly, Altair** for interactive visualization |
+| **Data Analysis & Visualization** | - **Matplotlib** &amp; **Seaborn** for standard charts <br> - **Plotly** &amp; **Altair** for interactive visualization |
 | **Machine Learning**  | - **Scikit-learn** for ML model development <br> - **Hdbscan** for clustering algorithms <br> - **SHAP** &amp; **LIME** for explainable AI (XAI) |
 | **MLOps**| - **Streamlit** for interactive app development <br> - **Docker** for containerization |
 | **Deployment Platforms** | - **Streamlit Community Cloud** for rapid prototyping  <br> - **Hugging Face Spaces** for open-source demo & reproducibility <br> - **AWS (EC2)** for scalable dockerized deployment for production |
