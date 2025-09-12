@@ -23,7 +23,7 @@ tags:
 <br>
 
 # 📑 Table of Contents
-- [App Walkthrough Video](#app-walkthrough-video)
+- [Live Walkthrough](#live-walkthrough)
 - [Features](#features)
 - [Who is this for?](#who-is-this-for)
 - [Using the App](#using-the-app)
@@ -32,7 +32,7 @@ tags:
 
 <br>
 
-# App Walkthrough Video
+# Live Walkthrough
 👉 [![YouTube Demo](https://img.shields.io/badge/YouTube-Demo-red?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/MxFCaVtEvsA)
 ---
 
