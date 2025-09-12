@@ -17,7 +17,7 @@ tags:
 </p>
 
 <h3 align="center">
-  An end-to-end app leveraging data science & AI/ML for <b>product analytics</b> and <b>business intelligence</b>.
+  An end-to-end app built to elevate companies by optimizing internal products with data science & AI/ML.
 </h3>
 
 <br>
@@ -56,12 +56,12 @@ tags:
 | 📊 Product Analytics                                  | Built ML models to **identify key profit-generating features**. |
 | 🔮 Profit Forecasting                                 | Fine-tuned ML models to **predict product growth**. |
 | 📈 Interactive Dashboards                             | Highlight **actionable recommendations** & **insights**.  |
-| 👥 Customer Segmentation & Churning       | Intelligently **group customers** with clusters & study them. |
-| ⚡ Accessible Solutions                               | Delivered all features in a **scalable app**, ready anytime. |
+| 👥 Customer Segmentation & Churning                   | Intelligently **group customers** with clusters & study them. |
+| ⚡ Accessible Solutions                                | Delivered all features in a **scalable app**, ready anytime. |
 
 <br>
 
-<p align="center">
+<p align="left">
   <img src="App_Visualizations/Homepage.png" alt="App Homepage" width="800">
 </p>
 
@@ -98,9 +98,9 @@ streamlit run app.py
 
 | | |
 |---|---|
-| **Data Processing**   | - **pandas, scipy, numpy** for data cleaning & feature engineering <br> - **imblearn** for handling class imbalance via data oversampling (SMOTE)|
-| **Data Analysis & Visualization** | - **Matplotlib, Seaborn** for standard charts <br> - **Plotly, Altair** for interactive visualization |
-| **Machine Learning**  | - **scikit-learn** for ML model development <br> - **hdbscan** for clustering algorithms <br> - **SHAP, LIME** for explainable AI (XAI) |
+| **Data Processing**   | - **Pandas, Scipy, Numpy** for data cleaning & feature engineering <br> - **Imblearn** for handling class imbalance via data oversampling (SMOTE)|
+| **Data Analysis & Visualization** | - **Matplotlib** &amp; **Seaborn** for standard charts <br> - **Plotly, Altair** for interactive visualization |
+| **Machine Learning**  | - **Scikit-learn** for ML model development <br> - **Hdbscan** for clustering algorithms <br> - **SHAP** &amp; **LIME** for explainable AI (XAI) |
 | **MLOps**| - **Streamlit** for interactive app development <br> - **Docker** for containerization |
 | **Deployment Platforms** | - **Streamlit Community Cloud** for rapid prototyping  <br> - **Hugging Face Spaces** for open-source demo & reproducibility <br> - **AWS (EC2)** for scalable dockerized deployment for production |
 | **Project Management**| - **GitHub Projects** for agile development & software development life cycle |
