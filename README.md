@@ -17,7 +17,7 @@ tags:
 </p>
 
 <h3 align="center">
-  An end-to-end app built to elevate companies by optimizing products with data science & AI/ML.
+  An app built to elevate companies by optimizing products with data science & AI/ML
 </h3>
 
 <br>
