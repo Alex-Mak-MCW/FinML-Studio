@@ -70,7 +70,6 @@ tags:
 - **Product Managers** → Track and evaluate product performance under a data-driven lens to support smarter decision-making.  
 - **Analysts** → Dive deep into product data, generate reports, and uncover trends using explainable ML models.  
 - **Business Leaders** → Quickly and conveniently gain high-level, actionable insights.
-- **Students & Learners** → Explore an end-to-end app that demonstrates the full ML model development lifecycle.  
 
 
 ---
