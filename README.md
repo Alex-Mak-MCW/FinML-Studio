@@ -12,8 +12,15 @@ tags:
 
 <hr>
 
+<!--
 <p align="center">
   <img src="App_Visualizations/Homepage_Icons/sidebar-icon.png" alt="App Icon" width="500">
+</p>
+-->
+
+
+<p align="center">
+  <img src="App_Visualizations/Homepage.png" alt="App Homepage" width="800">
 </p>
 
 <h3 align="center">
@@ -60,10 +67,6 @@ tags:
 | ⚡ Accessible Solutions                                | Delivered all features in a **scalable app**, ready anytime. |
 
 <br>
-
-<p align="left">
-  <img src="App_Visualizations/Homepage.png" alt="App Homepage" width="800">
-</p>
 
 # Who is this for?
 
